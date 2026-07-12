@@ -11,8 +11,12 @@ Nexus is an architecture-first codebase baseline. The repository currently start
 ## Repository Map
 
 - `docs/ARCHITECTURE.md` describes the intended system boundaries.
+- `docs/BOUNDARIES.md` defines dependency direction and ownership rules.
+- `docs/ARCHITECTURE_REVIEW.md` provides a repeatable architecture review workflow.
 - `docs/REFACTORING_PLAN.md` tracks the step-by-step refactoring workflow.
 - `docs/decisions/0001-architecture-baseline.md` records the first architecture decision.
+- `src/` reserves the future production-code boundaries.
+- `tests/` reserves the future verification boundaries.
 
 ## Next Step
 

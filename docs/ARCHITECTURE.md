@@ -23,6 +23,16 @@ Nexus should evolve toward these layers only when the codebase needs them:
 
 Dependencies should point inward: infrastructure and interfaces can depend on application code, application code can depend on domain code, and domain code should remain portable.
 
+The repository reserves these directories for that shape:
+
+- `src/domain`: rules, entities, value objects, and domain services.
+- `src/application`: use cases and workflow orchestration.
+- `src/interfaces`: delivery mechanisms such as HTTP, CLI, jobs, UI, or event handlers.
+- `src/infrastructure`: persistence, external APIs, filesystem, queues, and vendor SDKs.
+- `tests`: tests organized around behavior and architectural boundaries.
+
+See `docs/BOUNDARIES.md` for dependency rules.
+
 ## Review Checklist
 
 - Does each module have one clear reason to change?
