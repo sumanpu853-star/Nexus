@@ -1,29 +1,142 @@
-# Feature List
+# Nexus Feature List
 
 This file is the product source of truth for Nexus feature priority.
 
-## P0: Enforce Architecture Dependency Boundaries
+Source note: this roadmap is based on the Nexus feature research document using official n8n and Botpress documentation as of July 11, 2026.
 
-Status: Completed
+## Product Positioning
 
-Nexus should fail the architecture review when an inner layer imports from an outer layer. The first enforced boundary is that `src/domain` must not import from `src/application`, `src/interfaces`, or `src/infrastructure`.
+Nexus should be a secure visual AI workflow and agent orchestration platform for RAG, LLM tools, memory, webhooks, and business automation.
 
-Why first: every future feature depends on keeping the codebase shape healthy.
+In simple terms: n8n-style automation plus Botpress-style AI agents, with production-grade security and observability.
 
-## P1: Human-Friendly Failure Output
+## Current Priority Table
 
-Status: Completed
+| Area | Feature | Priority | Status |
+| --- | --- | --- | --- |
+| Security | Real auth, JWT/session login, user ownership checks, RBAC, project/workspace isolation | P0 | Planned |
+| Workflow Engine | DAG validation, branching, joins, retries, timeouts, error workflows, partial execution | P0 | Planned |
+| Safe Execution | Replace raw `python_script` execution with a sandboxed code runner or disabled production mode | P0 | Planned |
+| Credentials | Encrypted vault, credential ownership, credential sharing, external secret provider support | P0 | Planned |
+| Builder UX | Schema-driven node forms instead of raw JSON textareas | P0 | Planned |
+| Executions | Execution history, node-level logs, input/output snapshots, rerun from failed node | P1 | Planned |
+| RAG | Knowledge base manager, document ingestion, chunking, embedding, vector search, reranking | P1 | Planned |
+| AI Agents | Agent node with tools, memory, model selection, prompt/instruction editor, tool-call visibility | P1 | Planned |
+| Integrations | HTTP, Slack/Teams, Gmail/Outlook, Google Drive, GitHub, databases, webhooks, schedules | P1 | Planned |
+| Deployment | Save/publish states, webhook URLs, environment variables, dev/stage/prod separation | P1 | Planned |
+| Observability | Logs, traces, metrics, cost tracking, token usage, latency, failure-rate dashboards | P1 | Planned |
+| Collaboration | Workflow versions, compare, restore, comments, templates, import/export | P2 | Planned |
+| Human-in-loop | Approval node, manual review queue, human handoff, timeout/fallback path | P2 | Planned |
+| Marketplace | Plugin SDK, custom node packaging, verified community nodes, private nodes | P2 | Planned |
 
-Failed architecture checks should include concise file-level details and suggested next actions.
+## Recommended MVP Roadmap
 
-## P2: Markdown Report Output
+### Phase 1: Production Safety Gate
 
-Status: Planned
+Fix the current blockers first:
 
-The CLI should be able to emit a Markdown report for pull request comments and release artifacts.
+- Add real authentication.
+- Scope credentials and workflows by user/project.
+- Disable or sandbox `python_script`.
+- Fix LanceDB overwrite behavior.
+- Add execution redaction so secrets do not leak in logs/results.
 
-## P3: Feature Backlog Command
+### Phase 2: Workflow Builder Upgrade
 
-Status: Planned
+- Replace raw JSON config with typed forms.
+- Add node schemas exposed from the backend through `GET /nodes`.
+- Add validation before workflow execution.
+- Add workflow templates for common use cases.
 
-The CLI should expose the prioritized feature list and identify the next planned feature from the command line.
+### Phase 3: Execution Platform
+
+- Store every execution with status, duration, `started_by`, trigger type, per-node input/output, and error.
+- Add retry policies, timeout policies, and error branches.
+- Add manual, production, and webhook execution modes.
+
+### Phase 4: AI Agent Layer
+
+- Add an agent node that can call tools and workflows.
+- Add tool permission controls.
+- Add memory options: session memory, user memory, and semantic memory.
+- Add prompt/version history and model selection.
+- Add cost/token tracking.
+
+### Phase 5: Enterprise And Scale
+
+- Add queue-based workers with Redis/Postgres.
+- Add RBAC projects/workspaces.
+- Add source control or workflow version export to Git.
+- Add external secrets integration.
+- Add audit logs and an admin dashboard.
+
+## Feature Spec Highlights
+
+### Workflow Object
+
+Each workflow should include:
+
+- `id`
+- `name`
+- `description`
+- `owner_id`
+- `project_id`
+- `draft_version`
+- `published_version`
+- `nodes`
+- `edges`
+- `settings`
+- `created_at`
+- `updated_at`
+- `published_at`
+- `is_active`
+
+### Node Schema
+
+Each node should define:
+
+- `type`
+- `label`
+- `category`
+- `icon`
+- input handles and output handles
+- parameter schema
+- credential requirements
+- timeout/retry support
+- safe logging/redaction rules
+
+### Execution Object
+
+Each execution should track:
+
+- workflow ID and version
+- trigger source: `manual`, `webhook`, `schedule`, or `sub-workflow`
+- status: `queued`, `running`, `success`, `failed`, or `cancelled`
+- node run records
+- redacted state snapshots
+- duration, token usage, and cost
+- error message and failed node ID
+
+## Differentiating Features
+
+Nexus should stand out through:
+
+- AI-first workflow debugging: prompt, retrieved context, tool calls, and model output.
+- Built-in RAG pipeline builder.
+- Safe tool permissions per agent.
+- Human approval gates for sensitive actions.
+- Strong workflow security by default.
+- Local/self-hostable deployment for privacy-sensitive teams.
+
+## Completed Foundation Work
+
+These items were completed before this product roadmap replaced the placeholder feature list:
+
+| Feature | Status |
+| --- | --- |
+| Enforce architecture dependency boundaries | Completed |
+| Human-friendly architecture failure output | Completed |
+
+## Implementation Rule
+
+Build Nexus as an AI-native automation engine, not a generic workflow tool. Always implement planned work in priority order, starting with P0 production safety and security items.
