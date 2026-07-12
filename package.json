@@ -11,7 +11,7 @@
     "review:architecture": "node src/interfaces/cli.js",
     "validate:config": "node src/interfaces/cli.js --validate-config",
     "print:config-schema": "node src/interfaces/cli.js --print-config-schema",
-    "test": "node --test \"tests/**/*.test.js\""
+    "test": "node scripts/run-tests.js"
   },
   "engines": {
     "node": ">=20"

@@ -59,7 +59,7 @@ node src/interfaces/cli.js --print-config-schema
 Run tests:
 
 ```sh
-node --test "tests/**/*.test.js"
+npm test
 ```
 
 Run the same commands through npm scripts:
