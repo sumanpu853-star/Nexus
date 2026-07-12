@@ -1,6 +1,6 @@
 import { readFile, stat } from "node:fs/promises";
 import path from "node:path";
-import { normalizeWorkspacePath } from "../domain/architectureChecks.js";
+import { normalizeWorkspacePath } from "../domain/workspacePath.js";
 
 export function createFileSystemWorkspaceReader(root) {
   const absoluteRoot = path.resolve(root ?? process.cwd());

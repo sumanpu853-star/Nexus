@@ -1,7 +1,7 @@
 import {
-  DEFAULT_ARCHITECTURE_CHECKS,
-  evaluateArchitectureSnapshot
-} from "../domain/architectureChecks.js";
+  DEFAULT_ARCHITECTURE_CHECKS
+} from "../domain/architectureCheckDefinitions.js";
+import { evaluateArchitectureSnapshot } from "../domain/architectureSnapshotEvaluator.js";
 
 export async function reviewWorkspace({
   workspaceReader,
