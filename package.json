@@ -1,0 +1,17 @@
+{
+  "name": "nexus",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Architecture-first tooling for the Nexus repository.",
+  "bin": {
+    "nexus": "./src/interfaces/cli.js"
+  },
+  "scripts": {
+    "review:architecture": "node src/interfaces/cli.js",
+    "test": "node --test \"tests/**/*.test.js\""
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

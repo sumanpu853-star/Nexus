@@ -2,7 +2,7 @@
 
 ## Status
 
-This repository is intentionally minimal. There is no application code yet, so the first architectural decision is to define boundaries before selecting implementation details.
+This repository now includes a small Node.js CLI that reviews the workspace against the architecture baseline. The first workflow exists to exercise the intended layers while keeping future product choices open.
 
 ## Guiding Principles
 
@@ -43,7 +43,6 @@ See `docs/BOUNDARIES.md` for dependency rules.
 
 ## Open Questions
 
-- What runtime and language should Nexus use?
 - Is Nexus a service, library, web app, automation, desktop app, or mixed system?
 - What are the first user-facing workflows?
 - Which integrations or data stores are required?

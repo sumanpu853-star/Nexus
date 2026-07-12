@@ -15,9 +15,30 @@ Nexus is an architecture-first codebase baseline. The repository currently start
 - `docs/ARCHITECTURE_REVIEW.md` provides a repeatable architecture review workflow.
 - `docs/REFACTORING_PLAN.md` tracks the step-by-step refactoring workflow.
 - `docs/decisions/0001-architecture-baseline.md` records the first architecture decision.
+- `docs/decisions/0002-node-cli-first-workflow.md` records the first runtime and workflow decision.
 - `src/` reserves the future production-code boundaries.
 - `tests/` reserves the future verification boundaries.
 
+## Commands
+
+Run the architecture review CLI:
+
+```sh
+node src/interfaces/cli.js
+```
+
+Print the same report as JSON:
+
+```sh
+node src/interfaces/cli.js --json
+```
+
+Run tests:
+
+```sh
+node --test "tests/**/*.test.js"
+```
+
 ## Next Step
 
-Add or choose the initial application stack, then review the first concrete module boundary before implementation grows.
+Choose the first user-facing Nexus workflow, then add it through the existing domain, application, interface, and infrastructure boundaries.
