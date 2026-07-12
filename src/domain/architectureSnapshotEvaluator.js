@@ -1,4 +1,3 @@
-import { DEFAULT_ARCHITECTURE_CHECKS } from "./architectureCheckDefinitions.js";
 import { normalizeWorkspacePath } from "./workspacePath.js";
 
 const CHECK_EVALUATORS = new Map([
@@ -7,7 +6,7 @@ const CHECK_EVALUATORS = new Map([
   ["contentIncludes", evaluateContentIncludes]
 ]);
 
-export function evaluateArchitectureSnapshot(snapshot, checks = DEFAULT_ARCHITECTURE_CHECKS) {
+export function evaluateArchitectureSnapshot(snapshot, checks = []) {
   const entries = normalizeEntries(snapshot?.entries ?? {});
   const results = checks.map((check) => evaluateCheck(check, entries));
   const summary = summarizeResults(results);

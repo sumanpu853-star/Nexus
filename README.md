@@ -19,6 +19,8 @@ Nexus is an architecture-first codebase baseline with a small Node.js CLI for re
 - `docs/decisions/0001-architecture-baseline.md` records the first architecture decision.
 - `docs/decisions/0002-node-cli-first-workflow.md` records the first runtime and workflow decision.
 - `docs/decisions/0003-ci-validation-gate.md` records the CI validation decision.
+- `docs/decisions/0004-configurable-architecture-checks.md` records the configurable checks decision.
+- `nexus.config.json` defines the architecture checks used by the CLI and CI.
 - `src/` reserves the future production-code boundaries.
 - `tests/` reserves the future verification boundaries.
 
@@ -34,6 +36,12 @@ Print the same report as JSON:
 
 ```sh
 node src/interfaces/cli.js --json
+```
+
+Use a custom architecture config:
+
+```sh
+node src/interfaces/cli.js --config nexus.config.json
 ```
 
 Run tests:

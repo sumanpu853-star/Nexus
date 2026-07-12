@@ -4,6 +4,8 @@ Review a workspace against the Nexus architecture baseline.
 
 Options:
   --root <path>  Workspace root to review. Defaults to the current directory.
+  --config <path>
+                 Architecture config path. Defaults to nexus.config.json.
   --json         Print the report as JSON.
   -h, --help     Show this help text.
 `;
@@ -11,6 +13,7 @@ Options:
 export function parseArgs(args, defaults = {}) {
   const options = {
     root: defaults.root ?? process.cwd(),
+    config: defaults.config ?? "nexus.config.json",
     format: "text",
     help: false
   };
@@ -36,6 +39,18 @@ export function parseArgs(args, defaults = {}) {
       }
 
       options.root = root;
+      index += 1;
+      continue;
+    }
+
+    if (arg === "--config") {
+      const config = args[index + 1];
+
+      if (!config || config.startsWith("--")) {
+        throw new Error("--config requires a path.");
+      }
+
+      options.config = config;
       index += 1;
       continue;
     }

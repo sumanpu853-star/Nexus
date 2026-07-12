@@ -7,16 +7,21 @@ test("parseArgs uses text output and current root by default", () => {
 
   assert.deepEqual(options, {
     root: "/repo",
+    config: "nexus.config.json",
     format: "text",
     help: false
   });
 });
 
-test("parseArgs reads json format and root option", () => {
-  const options = parseArgs(["--json", "--root", "/workspace/nexus"], { root: "/repo" });
+test("parseArgs reads json format, root option, and config option", () => {
+  const options = parseArgs(
+    ["--json", "--root", "/workspace/nexus", "--config", "custom.config.json"],
+    { root: "/repo" }
+  );
 
   assert.deepEqual(options, {
     root: "/workspace/nexus",
+    config: "custom.config.json",
     format: "json",
     help: false
   });
@@ -30,10 +35,13 @@ test("parseArgs reads help flags", () => {
 test("parseArgs rejects missing root values and unknown arguments", () => {
   assert.throws(() => parseArgs(["--root"]), /--root requires a path/);
   assert.throws(() => parseArgs(["--root", "--json"]), /--root requires a path/);
+  assert.throws(() => parseArgs(["--config"]), /--config requires a path/);
+  assert.throws(() => parseArgs(["--config", "--json"]), /--config requires a path/);
   assert.throws(() => parseArgs(["--wat"]), /Unknown argument/);
 });
 
 test("help text documents the supported options", () => {
   assert.match(HELP_TEXT, /--root <path>/);
+  assert.match(HELP_TEXT, /--config <path>/);
   assert.match(HELP_TEXT, /--json/);
 });

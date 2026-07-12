@@ -39,3 +39,16 @@ test("reviewWorkspace requires a workspace reader", async () => {
     /requires a workspaceReader/
   );
 });
+
+test("reviewWorkspace requires architecture checks", async () => {
+  const workspaceReader = {
+    async readSnapshot() {
+      return { entries: {} };
+    }
+  };
+
+  await assert.rejects(
+    () => reviewWorkspace({ workspaceReader }),
+    /requires at least one architecture check/
+  );
+});

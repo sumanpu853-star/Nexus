@@ -1,14 +1,15 @@
-import {
-  DEFAULT_ARCHITECTURE_CHECKS
-} from "../domain/architectureCheckDefinitions.js";
 import { evaluateArchitectureSnapshot } from "../domain/architectureSnapshotEvaluator.js";
 
 export async function reviewWorkspace({
   workspaceReader,
-  checks = DEFAULT_ARCHITECTURE_CHECKS
+  checks
 } = {}) {
   if (!workspaceReader || typeof workspaceReader.readSnapshot !== "function") {
     throw new TypeError("reviewWorkspace requires a workspaceReader with readSnapshot().");
+  }
+
+  if (!Array.isArray(checks) || checks.length === 0) {
+    throw new TypeError("reviewWorkspace requires at least one architecture check.");
   }
 
   const targets = [...new Set(checks.map((check) => check.target))];

@@ -1,6 +1,7 @@
 import { readFile, stat } from "node:fs/promises";
 import path from "node:path";
 import { normalizeWorkspacePath } from "../domain/workspacePath.js";
+import { resolveInsideRoot } from "./resolveInsideRoot.js";
 
 export function createFileSystemWorkspaceReader(root) {
   const absoluteRoot = path.resolve(root ?? process.cwd());
@@ -53,16 +54,4 @@ async function readEntry(absoluteTarget) {
     type: "file",
     content: await readFile(absoluteTarget, "utf8")
   };
-}
-
-function resolveInsideRoot(root, workspacePath) {
-  const absoluteTarget = path.resolve(root, ...workspacePath.split("/"));
-  const relative = path.relative(root, absoluteTarget);
-  const isInsideRoot = relative === "" || (!relative.startsWith("..") && !path.isAbsolute(relative));
-
-  if (!isInsideRoot) {
-    throw new Error(`Refusing to read outside workspace: ${workspacePath}`);
-  }
-
-  return absoluteTarget;
 }
