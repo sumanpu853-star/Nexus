@@ -12,7 +12,7 @@ Why first: every future feature depends on keeping the codebase shape healthy.
 
 ## P1: Human-Friendly Failure Output
 
-Status: Planned
+Status: Completed
 
 Failed architecture checks should include concise file-level details and suggested next actions.
 

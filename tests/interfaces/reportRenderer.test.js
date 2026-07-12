@@ -29,7 +29,7 @@ test("renderTextReport renders the summary and check details", () => {
   assert.match(output, /\[pass\] Architecture document exists/);
 });
 
-test("renderTextReport includes guidance for failed checks", () => {
+test("renderTextReport includes next actions for failed checks", () => {
   const output = renderTextReport({
     ...passingReport,
     status: "fail",
@@ -44,7 +44,50 @@ test("renderTextReport includes guidance for failed checks", () => {
     ]
   });
 
-  assert.match(output, /Guidance: Document boundary rules/);
+  assert.match(output, /Next: Document boundary rules/);
+});
+
+test("renderTextReport includes file-level failure details", () => {
+  const output = renderTextReport({
+    ...passingReport,
+    status: "fail",
+    checks: [
+      {
+        status: "fail",
+        title: "Domain layer does not import outward layers",
+        severity: "required",
+        message: "src/domain imports forbidden dependencies in 2 place(s).",
+        guidance: "Keep src/domain independent.",
+        violations: [
+          {
+            file: "src/domain/order.js",
+            import: "../infrastructure/orderStore.js",
+            forbidden: "../infrastructure"
+          },
+          {
+            file: "src/domain/loader.cjs",
+            import: "../interfaces/api.js",
+            forbidden: "../interfaces"
+          }
+        ]
+      },
+      {
+        status: "fail",
+        title: "Architecture doc states dependency direction",
+        severity: "required",
+        message: "docs/ARCHITECTURE.md is missing expected text.",
+        guidance: "Document dependency direction.",
+        missing: ["Dependencies should point inward"]
+      }
+    ]
+  });
+
+  assert.match(output, /Details:/);
+  assert.match(
+    output,
+    /src\/domain\/order\.js imports "\.\.\/infrastructure\/orderStore\.js" \(forbidden by "\.\.\/infrastructure"\)/
+  );
+  assert.match(output, /Missing expected text: "Dependencies should point inward"/);
 });
 
 test("renderJsonReport renders pretty JSON", () => {

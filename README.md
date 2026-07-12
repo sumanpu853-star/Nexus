@@ -23,6 +23,7 @@ Nexus is an architecture-first codebase baseline with a small Node.js CLI for re
 - `docs/decisions/0004-configurable-architecture-checks.md` records the configurable checks decision.
 - `docs/decisions/0005-config-validation-commands.md` records the config validation command decision.
 - `docs/decisions/0006-feature-list-and-boundary-enforcement.md` records the feature-list and boundary-enforcement decision.
+- `docs/decisions/0007-human-friendly-failure-output.md` records the failure-output decision.
 - `nexus.config.json` defines the architecture checks used by the CLI and CI.
 - `src/` reserves the future production-code boundaries.
 - `tests/` reserves the future verification boundaries.
@@ -76,4 +77,4 @@ npm run print:config-schema
 
 ## Next Step
 
-Build the next planned feature from `docs/FEATURES.md`: human-friendly failure output.
+Build the next planned feature from `docs/FEATURES.md`: Markdown report output.

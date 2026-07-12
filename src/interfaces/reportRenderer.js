@@ -29,9 +29,42 @@ export function renderTextReport(report) {
     lines.push(`  ${check.message}`);
 
     if (check.status === "fail") {
-      lines.push(`  Guidance: ${check.guidance}`);
+      lines.push(...renderFailureDetails(check));
+      lines.push(`  Next: ${check.guidance}`);
     }
   }
 
   return lines.join("\n");
+}
+
+function renderFailureDetails(check) {
+  const details = [
+    ...renderMissingTextDetails(check.missing),
+    ...renderForbiddenImportDetails(check.violations)
+  ];
+
+  if (details.length === 0) {
+    return [];
+  }
+
+  return ["  Details:", ...details.map((detail) => `  - ${detail}`)];
+}
+
+function renderMissingTextDetails(missing) {
+  if (!Array.isArray(missing) || missing.length === 0) {
+    return [];
+  }
+
+  return missing.map((text) => `Missing expected text: "${text}"`);
+}
+
+function renderForbiddenImportDetails(violations) {
+  if (!Array.isArray(violations) || violations.length === 0) {
+    return [];
+  }
+
+  return violations.map(
+    (violation) =>
+      `${violation.file} imports "${violation.import}" (forbidden by "${violation.forbidden}")`
+  );
 }
