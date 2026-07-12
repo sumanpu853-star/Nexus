@@ -15,11 +15,14 @@ Nexus is an architecture-first codebase baseline with a small Node.js CLI for re
 - `docs/ARCHITECTURE.md` describes the intended system boundaries.
 - `docs/BOUNDARIES.md` defines dependency direction and ownership rules.
 - `docs/ARCHITECTURE_REVIEW.md` provides a repeatable architecture review workflow.
+- `docs/FEATURES.md` is the source of truth for feature priority.
 - `docs/REFACTORING_PLAN.md` tracks the step-by-step refactoring workflow.
 - `docs/decisions/0001-architecture-baseline.md` records the first architecture decision.
 - `docs/decisions/0002-node-cli-first-workflow.md` records the first runtime and workflow decision.
 - `docs/decisions/0003-ci-validation-gate.md` records the CI validation decision.
 - `docs/decisions/0004-configurable-architecture-checks.md` records the configurable checks decision.
+- `docs/decisions/0005-config-validation-commands.md` records the config validation command decision.
+- `docs/decisions/0006-feature-list-and-boundary-enforcement.md` records the feature-list and boundary-enforcement decision.
 - `nexus.config.json` defines the architecture checks used by the CLI and CI.
 - `src/` reserves the future production-code boundaries.
 - `tests/` reserves the future verification boundaries.
@@ -73,4 +76,4 @@ npm run print:config-schema
 
 ## Next Step
 
-Choose the first user-facing Nexus workflow, then add it through the existing domain, application, interface, and infrastructure boundaries.
+Build the next planned feature from `docs/FEATURES.md`: human-friendly failure output.

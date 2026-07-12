@@ -3,8 +3,12 @@ import { normalizeWorkspacePath } from "./workspacePath.js";
 const CHECK_EVALUATORS = new Map([
   ["fileExists", evaluateFileExists],
   ["directoryExists", evaluateDirectoryExists],
-  ["contentIncludes", evaluateContentIncludes]
+  ["contentIncludes", evaluateContentIncludes],
+  ["forbiddenImports", evaluateForbiddenImports]
 ]);
+
+const IMPORT_SPECIFIER_PATTERN =
+  /\b(?:import|export)\s+(?:[^'"]*?\s+from\s+)?["']([^"']+)["']|\brequire\s*\(\s*["']([^"']+)["']\s*\)|\bimport\s*\(\s*["']([^"']+)["']\s*\)/g;
 
 export function evaluateArchitectureSnapshot(snapshot, checks = []) {
   const entries = normalizeEntries(snapshot?.entries ?? {});
@@ -30,11 +34,21 @@ function normalizeEntries(entries) {
   for (const [target, entry] of pairs) {
     normalized.set(normalizeWorkspacePath(target), {
       type: entry.type,
-      content: entry.content ?? ""
+      content: entry.content ?? "",
+      files: normalizeEntryFiles(entry.files ?? {})
     });
   }
 
   return normalized;
+}
+
+function normalizeEntryFiles(files) {
+  return Object.fromEntries(
+    Object.entries(files).map(([target, content]) => [
+      normalizeWorkspacePath(target),
+      typeof content === "string" ? content : ""
+    ])
+  );
 }
 
 function evaluateCheck(check, entries) {
@@ -108,6 +122,60 @@ function evaluateContentIncludes(base, entry, check) {
         : `${base.target} is missing expected text: ${missing.join(", ")}.`,
     missing
   };
+}
+
+function evaluateForbiddenImports(base, entry, check) {
+  if (entry?.type !== "directory" && entry?.type !== "file") {
+    return {
+      ...base,
+      status: "fail",
+      message: `Cannot inspect ${base.target} because it is missing or is not a file or directory.`,
+      violations: []
+    };
+  }
+
+  const files = entry.type === "file" ? { [base.target]: entry.content ?? "" } : entry.files ?? {};
+  const violations = findForbiddenImportViolations(files, check.forbidden ?? []);
+
+  return {
+    ...base,
+    status: violations.length === 0 ? "pass" : "fail",
+    message:
+      violations.length === 0
+        ? `${base.target} does not import forbidden dependencies.`
+        : `${base.target} imports forbidden dependencies in ${violations.length} place(s).`,
+    violations
+  };
+}
+
+function findForbiddenImportViolations(files, forbidden) {
+  const violations = [];
+
+  for (const [file, content] of Object.entries(files)) {
+    for (const specifier of findImportSpecifiers(content)) {
+      const forbiddenPrefix = forbidden.find((prefix) => specifier.startsWith(prefix));
+
+      if (forbiddenPrefix) {
+        violations.push({
+          file,
+          import: specifier,
+          forbidden: forbiddenPrefix
+        });
+      }
+    }
+  }
+
+  return violations;
+}
+
+function findImportSpecifiers(content) {
+  const specifiers = [];
+
+  for (const match of content.matchAll(IMPORT_SPECIFIER_PATTERN)) {
+    specifiers.push(match[1] ?? match[2] ?? match[3]);
+  }
+
+  return specifiers;
 }
 
 function summarizeResults(results) {

@@ -10,15 +10,25 @@ test("reads requested files and directories from disk", async () => {
 
   try {
     await mkdir(path.join(root, "docs"), { recursive: true });
+    await mkdir(path.join(root, "src", "domain"), { recursive: true });
     await writeFile(path.join(root, "docs", "ARCHITECTURE.md"), "# Architecture", "utf8");
+    await writeFile(
+      path.join(root, "src", "domain", "model.js"),
+      'import { Entity } from "./entity.js";',
+      "utf8"
+    );
+    await writeFile(path.join(root, "src", "domain", "notes.txt"), "not source", "utf8");
 
     const reader = createFileSystemWorkspaceReader(root);
     const snapshot = await reader.readSnapshot({
-      targets: ["docs", "docs/ARCHITECTURE.md", "missing.md"]
+      targets: ["docs", "src/domain", "docs/ARCHITECTURE.md", "missing.md"]
     });
 
     assert.equal(snapshot.root, root);
     assert.equal(snapshot.entries.docs.type, "directory");
+    assert.deepEqual(snapshot.entries["src/domain"].files, {
+      "src/domain/model.js": 'import { Entity } from "./entity.js";'
+    });
     assert.equal(snapshot.entries["docs/ARCHITECTURE.md"].type, "file");
     assert.equal(snapshot.entries["docs/ARCHITECTURE.md"].content, "# Architecture");
     assert.equal(snapshot.entries["missing.md"], undefined);

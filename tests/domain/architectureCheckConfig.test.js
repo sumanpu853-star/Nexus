@@ -41,6 +41,24 @@ test("parseArchitectureCheckConfig supports content includes expected text", () 
   assert.equal(Object.isFrozen(checks[0].expected), true);
 });
 
+test("parseArchitectureCheckConfig supports forbidden imports", () => {
+  const checks = parseArchitectureCheckConfig({
+    architecture: {
+      checks: [
+        {
+          ...baseCheck,
+          kind: "forbiddenImports",
+          target: "src/domain",
+          forbidden: ["../infrastructure"]
+        }
+      ]
+    }
+  });
+
+  assert.deepEqual(checks[0].forbidden, ["../infrastructure"]);
+  assert.equal(Object.isFrozen(checks[0].forbidden), true);
+});
+
 test("parseArchitectureCheckConfig rejects missing checks", () => {
   assert.throws(
     () => parseArchitectureCheckConfig({ architecture: { checks: [] } }),
@@ -91,5 +109,27 @@ test("parseArchitectureCheckConfig requires expected text for content checks", (
         }
       }),
     /must define expected text/
+  );
+});
+
+test("parseArchitectureCheckConfig requires forbidden imports for forbidden import checks", () => {
+  assert.throws(
+    () =>
+      parseArchitectureCheckConfig({
+        architecture: {
+          checks: [{ ...baseCheck, kind: "forbiddenImports" }]
+        }
+      }),
+    /must define forbidden imports/
+  );
+
+  assert.throws(
+    () =>
+      parseArchitectureCheckConfig({
+        architecture: {
+          checks: [{ ...baseCheck, kind: "forbiddenImports", forbidden: [""] }]
+        }
+      }),
+    /invalid forbidden import/
   );
 });

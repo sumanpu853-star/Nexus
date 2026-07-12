@@ -24,7 +24,7 @@ export const ARCHITECTURE_CONFIG_SCHEMA = deepFreeze({
               target: nonEmptyString("Repository-relative path to inspect."),
               kind: {
                 type: "string",
-                enum: ["fileExists", "directoryExists", "contentIncludes"]
+                enum: ["fileExists", "directoryExists", "contentIncludes", "forbiddenImports"]
               },
               severity: {
                 type: "string",
@@ -34,6 +34,11 @@ export const ARCHITECTURE_CONFIG_SCHEMA = deepFreeze({
                 type: "array",
                 minItems: 1,
                 items: nonEmptyString("Text expected in the target file.")
+              },
+              forbidden: {
+                type: "array",
+                minItems: 1,
+                items: nonEmptyString("Import specifier prefix that must not be used.")
               },
               guidance: nonEmptyString("Actionable guidance when the check fails.")
             },
@@ -47,6 +52,17 @@ export const ARCHITECTURE_CONFIG_SCHEMA = deepFreeze({
                 },
                 then: {
                   required: ["expected"]
+                }
+              },
+              {
+                if: {
+                  properties: {
+                    kind: { const: "forbiddenImports" }
+                  },
+                  required: ["kind"]
+                },
+                then: {
+                  required: ["forbidden"]
                 }
               }
             ]

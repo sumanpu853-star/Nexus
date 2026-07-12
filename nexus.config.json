@@ -10,6 +10,14 @@
         "guidance": "Keep architecture checks configurable in nexus.config.json."
       },
       {
+        "id": "feature-list",
+        "title": "Feature list exists",
+        "target": "docs/FEATURES.md",
+        "kind": "fileExists",
+        "severity": "required",
+        "guidance": "Keep docs/FEATURES.md as the source of truth for feature priority."
+      },
+      {
         "id": "architecture-doc",
         "title": "Architecture document exists",
         "target": "docs/ARCHITECTURE.md",
@@ -64,6 +72,19 @@
         "kind": "directoryExists",
         "severity": "required",
         "guidance": "Keep domain rules independent from frameworks and infrastructure."
+      },
+      {
+        "id": "domain-layer-import-boundary",
+        "title": "Domain layer does not import outward layers",
+        "target": "src/domain",
+        "kind": "forbiddenImports",
+        "severity": "required",
+        "forbidden": [
+          "../application",
+          "../interfaces",
+          "../infrastructure"
+        ],
+        "guidance": "Keep src/domain independent from application, interface, and infrastructure layers."
       },
       {
         "id": "application-layer",

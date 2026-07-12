@@ -1,6 +1,20 @@
-const CHECK_KINDS = new Set(["fileExists", "directoryExists", "contentIncludes"]);
+const CHECK_KINDS = new Set([
+  "fileExists",
+  "directoryExists",
+  "contentIncludes",
+  "forbiddenImports"
+]);
 const CHECK_SEVERITIES = new Set(["required", "recommended"]);
-const CHECK_FIELDS = new Set(["id", "title", "target", "kind", "severity", "expected", "guidance"]);
+const CHECK_FIELDS = new Set([
+  "id",
+  "title",
+  "target",
+  "kind",
+  "severity",
+  "expected",
+  "forbidden",
+  "guidance"
+]);
 
 export function parseArchitectureCheckConfig(config) {
   const checks = config?.architecture?.checks;
@@ -42,6 +56,10 @@ function normalizeCheck(check, index) {
     normalized.expected = normalizeExpected(check.expected, normalized.id);
   }
 
+  if (normalized.kind === "forbiddenImports") {
+    normalized.forbidden = normalizeForbidden(check.forbidden, normalized.id);
+  }
+
   return Object.freeze(normalized);
 }
 
@@ -73,4 +91,18 @@ function normalizeExpected(expected, id) {
   }
 
   return Object.freeze([...expected]);
+}
+
+function normalizeForbidden(forbidden, id) {
+  if (!Array.isArray(forbidden) || forbidden.length === 0) {
+    throw new Error(`Architecture check ${id} must define forbidden imports.`);
+  }
+
+  for (const value of forbidden) {
+    if (typeof value !== "string" || value.trim() === "") {
+      throw new Error(`Architecture check ${id} has invalid forbidden import.`);
+    }
+  }
+
+  return Object.freeze([...forbidden]);
 }

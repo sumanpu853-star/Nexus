@@ -18,5 +18,24 @@ test("architecture config schema describes supported check kinds", () => {
   const kindSchema =
     ARCHITECTURE_CONFIG_SCHEMA.properties.architecture.properties.checks.items.properties.kind;
 
-  assert.deepEqual(kindSchema.enum, ["fileExists", "directoryExists", "contentIncludes"]);
+  assert.deepEqual(kindSchema.enum, [
+    "fileExists",
+    "directoryExists",
+    "contentIncludes",
+    "forbiddenImports"
+  ]);
+});
+
+test("architecture config schema requires forbidden entries for forbidden import checks", () => {
+  const checkSchema = ARCHITECTURE_CONFIG_SCHEMA.properties.architecture.properties.checks.items;
+
+  assert.equal(checkSchema.properties.forbidden.type, "array");
+  assert.equal(
+    checkSchema.allOf.some(
+      (condition) =>
+        condition.if?.properties?.kind?.const === "forbiddenImports" &&
+        condition.then?.required?.includes("forbidden")
+    ),
+    true
+  );
 });

@@ -89,3 +89,69 @@ test("reports missing expected architecture text", () => {
   assert.equal(report.status, "fail");
   assert.deepEqual(report.checks[0].missing, ["Dependencies should point inward"]);
 });
+
+test("passes forbidden import checks when source files stay inside boundaries", () => {
+  const checks = [
+    {
+      id: "domain-boundary",
+      title: "Domain stays inward",
+      target: "src/domain",
+      kind: "forbiddenImports",
+      severity: "required",
+      forbidden: ["../infrastructure"],
+      guidance: "Keep domain independent."
+    }
+  ];
+  const report = evaluateArchitectureSnapshot({
+    entries: {
+      "src/domain": {
+        type: "directory",
+        files: {
+          "src/domain/order.js": 'import { Entity } from "./entity.js";'
+        }
+      }
+    }
+  }, checks);
+
+  assert.equal(report.status, "pass");
+  assert.equal(report.checks[0].violations.length, 0);
+});
+
+test("fails forbidden import checks when source files cross boundaries", () => {
+  const checks = [
+    {
+      id: "domain-boundary",
+      title: "Domain stays inward",
+      target: "src/domain",
+      kind: "forbiddenImports",
+      severity: "required",
+      forbidden: ["../infrastructure", "../interfaces"],
+      guidance: "Keep domain independent."
+    }
+  ];
+  const report = evaluateArchitectureSnapshot({
+    entries: {
+      "src/domain": {
+        type: "directory",
+        files: {
+          "src/domain/order.js": 'import { saveOrder } from "../infrastructure/orderStore.js";',
+          "src/domain/loader.cjs": 'const api = require("../interfaces/api.js");'
+        }
+      }
+    }
+  }, checks);
+
+  assert.equal(report.status, "fail");
+  assert.deepEqual(report.checks[0].violations, [
+    {
+      file: "src/domain/order.js",
+      import: "../infrastructure/orderStore.js",
+      forbidden: "../infrastructure"
+    },
+    {
+      file: "src/domain/loader.cjs",
+      import: "../interfaces/api.js",
+      forbidden: "../interfaces"
+    }
+  ]);
+});
