@@ -96,6 +96,14 @@ export const DEFAULT_ARCHITECTURE_CHECKS = Object.freeze([
     guidance: "Use a PR template to make architecture checks part of code review."
   },
   {
+    id: "ci-workflow",
+    title: "CI workflow exists",
+    target: ".github/workflows/ci.yml",
+    kind: "fileExists",
+    severity: "required",
+    guidance: "Keep an automated validation gate for pushes and pull requests."
+  },
+  {
     id: "architecture-dependency-direction",
     title: "Architecture doc states dependency direction",
     target: "docs/ARCHITECTURE.md",
@@ -121,5 +129,14 @@ export const DEFAULT_ARCHITECTURE_CHECKS = Object.freeze([
     severity: "recommended",
     expected: ["Architecture Check"],
     guidance: "The PR template should remind reviewers to check architecture boundaries."
+  },
+  {
+    id: "ci-runs-validation",
+    title: "CI workflow runs validation commands",
+    target: ".github/workflows/ci.yml",
+    kind: "contentIncludes",
+    severity: "required",
+    expected: ["npm test", "npm run review:architecture"],
+    guidance: "CI should run both the test suite and the architecture review."
   }
 ].map(Object.freeze));
