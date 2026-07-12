@@ -44,6 +44,18 @@ Use a custom architecture config:
 node src/interfaces/cli.js --config nexus.config.json
 ```
 
+Validate only the config:
+
+```sh
+node src/interfaces/cli.js --validate-config
+```
+
+Print the config JSON Schema:
+
+```sh
+node src/interfaces/cli.js --print-config-schema
+```
+
 Run tests:
 
 ```sh
@@ -54,7 +66,9 @@ Run the same commands through npm scripts:
 
 ```sh
 npm test
+npm run validate:config
 npm run review:architecture
+npm run print:config-schema
 ```
 
 ## Next Step

@@ -70,6 +70,18 @@ test("parseArchitectureCheckConfig rejects unsupported kinds and severities", ()
   );
 });
 
+test("parseArchitectureCheckConfig rejects unsupported fields", () => {
+  assert.throws(
+    () =>
+      parseArchitectureCheckConfig({
+        architecture: {
+          checks: [{ ...baseCheck, owner: "architecture" }]
+        }
+      }),
+    /unsupported field/
+  );
+});
+
 test("parseArchitectureCheckConfig requires expected text for content checks", () => {
   assert.throws(
     () =>

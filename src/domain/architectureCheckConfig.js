@@ -1,5 +1,6 @@
 const CHECK_KINDS = new Set(["fileExists", "directoryExists", "contentIncludes"]);
 const CHECK_SEVERITIES = new Set(["required", "recommended"]);
+const CHECK_FIELDS = new Set(["id", "title", "target", "kind", "severity", "expected", "guidance"]);
 
 export function parseArchitectureCheckConfig(config) {
   const checks = config?.architecture?.checks;
@@ -15,6 +16,8 @@ function normalizeCheck(check, index) {
   if (!check || typeof check !== "object" || Array.isArray(check)) {
     throw new Error(`Architecture check at index ${index} must be an object.`);
   }
+
+  rejectUnknownFields(check, index);
 
   const normalized = {
     id: requiredString(check.id, "id", index),
@@ -40,6 +43,14 @@ function normalizeCheck(check, index) {
   }
 
   return Object.freeze(normalized);
+}
+
+function rejectUnknownFields(check, index) {
+  for (const field of Object.keys(check)) {
+    if (!CHECK_FIELDS.has(field)) {
+      throw new Error(`Architecture check at index ${index} has unsupported field: ${field}.`);
+    }
+  }
 }
 
 function requiredString(value, field, index) {

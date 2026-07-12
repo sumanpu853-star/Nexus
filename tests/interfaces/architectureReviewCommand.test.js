@@ -62,25 +62,25 @@ test("runArchitectureReviewCommand reviews the requested root with configured ch
   const exitCode = await runArchitectureReviewCommand(
     ["--root", "/workspace", "--config", "custom.config.json"],
     {
-    stdout: (value) => output.push(value),
-    createConfigReader(root) {
-      assert.equal(root, "/workspace");
-      return {
-        async readConfig({ configPath }) {
-          requestedConfigPath = configPath;
-          return { checks };
-        }
-      };
-    },
-    createWorkspaceReader(root) {
-      requestedRoot = root;
-      return { root };
-    },
-    async review({ workspaceReader, checks: reviewChecks }) {
-      assert.deepEqual(workspaceReader, { root: "/workspace" });
-      assert.equal(reviewChecks, checks);
-      return createReport("pass");
-    }
+      stdout: (value) => output.push(value),
+      createConfigReader(root) {
+        assert.equal(root, "/workspace");
+        return {
+          async readConfig({ configPath }) {
+            requestedConfigPath = configPath;
+            return { checks };
+          }
+        };
+      },
+      createWorkspaceReader(root) {
+        requestedRoot = root;
+        return { root };
+      },
+      async review({ workspaceReader, checks: reviewChecks }) {
+        assert.deepEqual(workspaceReader, { root: "/workspace" });
+        assert.equal(reviewChecks, checks);
+        return createReport("pass");
+      }
     }
   );
 
@@ -112,4 +112,54 @@ test("runArchitectureReviewCommand prints JSON and returns failure exit code", a
 
   assert.equal(exitCode, 1);
   assert.equal(JSON.parse(output[0]).status, "fail");
+});
+
+test("runArchitectureReviewCommand validates config without reviewing workspace", async () => {
+  const output = [];
+  let workspaceReaderCreated = false;
+
+  const exitCode = await runArchitectureReviewCommand(["--validate-config"], {
+    stdout: (value) => output.push(value),
+    createConfigReader() {
+      return { root: "/repo" };
+    },
+    createWorkspaceReader() {
+      workspaceReaderCreated = true;
+      return {};
+    },
+    async validateConfig({ configReader, configPath }) {
+      assert.deepEqual(configReader, { root: "/repo" });
+      assert.equal(configPath, "nexus.config.json");
+      return {
+        root: "/repo",
+        path: configPath,
+        status: "pass",
+        summary: { checks: 3 }
+      };
+    }
+  });
+
+  assert.equal(exitCode, 0);
+  assert.equal(workspaceReaderCreated, false);
+  assert.match(output[0], /Nexus Config Validation/);
+});
+
+test("runArchitectureReviewCommand prints the config schema without reading config", async () => {
+  const output = [];
+  let configReaderCreated = false;
+
+  const exitCode = await runArchitectureReviewCommand(["--print-config-schema"], {
+    stdout: (value) => output.push(value),
+    createConfigReader() {
+      configReaderCreated = true;
+      return {};
+    },
+    getConfigSchema() {
+      return { title: "Schema" };
+    }
+  });
+
+  assert.equal(exitCode, 0);
+  assert.equal(configReaderCreated, false);
+  assert.deepEqual(JSON.parse(output[0]), { title: "Schema" });
 });

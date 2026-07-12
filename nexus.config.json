@@ -157,6 +157,7 @@
         "severity": "required",
         "expected": [
           "npm test",
+          "npm run validate:config",
           "npm run review:architecture"
         ],
         "guidance": "CI should run both the test suite and the architecture review."

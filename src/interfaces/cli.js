@@ -5,6 +5,7 @@ import { runArchitectureReviewCommand } from "./architectureReviewCommand.js";
 
 export { runArchitectureReviewCommand } from "./architectureReviewCommand.js";
 export { HELP_TEXT, parseArgs } from "./cliArgs.js";
+export { renderConfigValidationReport } from "./configValidationRenderer.js";
 export { renderJsonReport, renderReport, renderTextReport } from "./reportRenderer.js";
 
 export async function main(argv = process.argv.slice(2)) {

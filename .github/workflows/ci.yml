@@ -36,5 +36,8 @@ jobs:
       - name: Run tests
         run: npm test
 
+      - name: Validate config
+        run: npm run validate:config
+
       - name: Run architecture review
         run: npm run review:architecture

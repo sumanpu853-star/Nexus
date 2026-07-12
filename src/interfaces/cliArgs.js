@@ -6,6 +6,10 @@ Options:
   --root <path>  Workspace root to review. Defaults to the current directory.
   --config <path>
                  Architecture config path. Defaults to nexus.config.json.
+  --validate-config
+                 Validate the config without running the workspace review.
+  --print-config-schema
+                 Print the Nexus config JSON Schema.
   --json         Print the report as JSON.
   -h, --help     Show this help text.
 `;
@@ -15,6 +19,7 @@ export function parseArgs(args, defaults = {}) {
     root: defaults.root ?? process.cwd(),
     config: defaults.config ?? "nexus.config.json",
     format: "text",
+    mode: "review",
     help: false
   };
 
@@ -28,6 +33,16 @@ export function parseArgs(args, defaults = {}) {
 
     if (arg === "-h" || arg === "--help") {
       options.help = true;
+      continue;
+    }
+
+    if (arg === "--validate-config") {
+      setMode(options, "validate-config", arg);
+      continue;
+    }
+
+    if (arg === "--print-config-schema") {
+      setMode(options, "print-config-schema", arg);
       continue;
     }
 
@@ -59,4 +74,12 @@ export function parseArgs(args, defaults = {}) {
   }
 
   return options;
+}
+
+function setMode(options, mode, arg) {
+  if (options.mode !== "review" && options.mode !== mode) {
+    throw new Error(`${arg} cannot be combined with another command mode.`);
+  }
+
+  options.mode = mode;
 }
