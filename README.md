@@ -13,6 +13,7 @@ Nexus is an architecture-first codebase baseline with a small Node.js CLI for re
 - P0 safe execution covers disabled unsafe nodes plus an explicit sandboxed runner boundary for code execution.
 - P0 workflow engine foundation covers DAG validation, branching/joins, retry/timeout defaults, error branches, execution records, and partial rerun planning.
 - P0 builder UX foundation covers schema-driven node definitions, workflow node parameter validation, templates, node forms, and catalog handlers.
+- P1 execution history now includes summarized execution lists, node-level logs, diagnostic timelines, detail routes, and failed-node rerun routes.
 - The LanceDB overwrite blocker was audited and is not applicable until vector-store code is introduced.
 - CI runs tests and the architecture review on pushes and pull requests.
 
@@ -40,6 +41,7 @@ Nexus is an architecture-first codebase baseline with a small Node.js CLI for re
 - `docs/decisions/0014-workflow-execution-records-and-error-branches.md` records the execution planning decision.
 - `docs/decisions/0015-schema-driven-node-catalog.md` records the node catalog decision.
 - `docs/decisions/0016-p0-foundation-completion.md` records the P0 completion boundary.
+- `docs/decisions/0017-p1-execution-history-and-logs.md` records the first P1 execution diagnostics decision.
 - `nexus.config.json` defines the architecture checks used by the CLI and CI.
 - `src/` reserves the future production-code boundaries.
 - `tests/` reserves the future verification boundaries.
@@ -93,4 +95,4 @@ npm run print:config-schema
 
 ## Next Step
 
-Move to P1 from `docs/FEATURES.md`: deepen execution history, RAG, AI agents, integrations, deployment, and observability.
+Continue P1 from `docs/FEATURES.md`: finish deeper execution diagnostics, then move to RAG, AI agents, integrations, deployment, and observability.

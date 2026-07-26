@@ -13,11 +13,16 @@ import {
   WorkflowExecutionValidationError,
   assertExecutionBelongsToProjectWorkflow,
   createWorkflowExecutionRecord,
+  createWorkflowNodeLogRecord,
   createWorkflowNodeRunRecord,
   isTerminalExecutionStatus,
   isTerminalNodeRunStatus,
   normalizeExecutionError
 } from "../domain/workflowExecutionPolicy.js";
+import {
+  createWorkflowExecutionHistory,
+  createWorkflowExecutionTimeline
+} from "../domain/workflowExecutionHistoryPolicy.js";
 
 export function createWorkflowExecutionService({
   projectRepository,
@@ -200,6 +205,7 @@ export function createWorkflowExecutionService({
         input: input === null ? existingNodeRun?.input ?? null : redactSnapshot(input, secretValues),
         output: output === null ? null : redactSnapshot(output, secretValues),
         error: error === null ? null : redactSnapshot(normalizeExecutionError(error), secretValues),
+        logs: existingNodeRun?.logs ?? [],
         started_at: existingNodeRun?.started_at ?? timestamp,
         finished_at: isTerminalNodeRunStatus(status) ? timestamp : null,
         duration_ms: isTerminalNodeRunStatus(status)
@@ -223,6 +229,84 @@ export function createWorkflowExecutionService({
       });
 
       return executionRepository.save(nextExecution);
+    },
+
+    async recordNodeRunLog({
+      actor,
+      project_id,
+      execution_id,
+      node_id,
+      attempt = 1,
+      level,
+      message,
+      metadata = {},
+      secretValues = []
+    } = {}) {
+      const { project } = await authorizeProjectAction({
+        actor,
+        projectRepository,
+        membershipRepository,
+        project_id,
+        permission: PROJECT_PERMISSIONS.RUN_WORKFLOW
+      });
+      const execution = await requireExecution(executionRepository, execution_id);
+
+      if (execution.project_id !== project.id) {
+        throw new WorkflowExecutionValidationError("Execution is not available in this project.", {
+          code: "workflow_execution_not_in_project",
+          details: { project_id: project.id, execution_id: execution.id }
+        });
+      }
+
+      if (isTerminalExecutionStatus(execution.status)) {
+        throw new WorkflowExecutionValidationError("Execution has already reached a terminal state.", {
+          code: "workflow_execution_already_terminal",
+          details: { execution_id: execution.id, status: execution.status }
+        });
+      }
+
+      assertNodeBelongsToExecutionPlan({ execution, node_id });
+
+      const timestamp = nowIso(clock);
+      const existingNodeRun = requireNodeRun({
+        execution,
+        node_id,
+        attempt
+      });
+      const logEvent = createWorkflowNodeLogRecord({
+        id: nextId(idGenerator, "node_log"),
+        execution_id: execution.id,
+        node_id: existingNodeRun.node_id,
+        level,
+        message: redactSnapshot(message, secretValues),
+        timestamp,
+        metadata: redactSnapshot(metadata, secretValues)
+      });
+      const nodeRun = createWorkflowNodeRunRecord({
+        ...existingNodeRun,
+        status:
+          existingNodeRun.status === WORKFLOW_NODE_RUN_STATUSES.QUEUED
+            ? WORKFLOW_NODE_RUN_STATUSES.RUNNING
+            : existingNodeRun.status,
+        logs: [...(existingNodeRun.logs ?? []), logEvent],
+        started_at: existingNodeRun.started_at ?? timestamp
+      });
+      const nodeRuns = replaceNodeRun({
+        node_runs: execution.node_runs,
+        nodeRun
+      });
+
+      return executionRepository.save(
+        createWorkflowExecutionRecord({
+          ...execution,
+          status:
+            execution.status === WORKFLOW_EXECUTION_STATUSES.QUEUED
+              ? WORKFLOW_EXECUTION_STATUSES.RUNNING
+              : execution.status,
+          node_runs: nodeRuns,
+          updated_at: timestamp
+        })
+      );
     },
 
     async getWorkflowExecution({
@@ -249,6 +333,30 @@ export function createWorkflowExecutionService({
       return execution;
     },
 
+    async getWorkflowExecutionTimeline({
+      actor,
+      project_id,
+      execution_id
+    } = {}) {
+      const { project } = await authorizeProjectAction({
+        actor,
+        projectRepository,
+        membershipRepository,
+        project_id,
+        permission: PROJECT_PERMISSIONS.READ_WORKFLOW
+      });
+      const execution = await requireExecution(executionRepository, execution_id);
+
+      if (execution.project_id !== project.id) {
+        throw new WorkflowExecutionValidationError("Execution is not available in this project.", {
+          code: "workflow_execution_not_in_project",
+          details: { project_id: project.id, execution_id: execution.id }
+        });
+      }
+
+      return createWorkflowExecutionTimeline({ execution });
+    },
+
     async listWorkflowExecutions({
       actor,
       project_id,
@@ -268,6 +376,39 @@ export function createWorkflowExecutionService({
       });
 
       return executionRepository.findByWorkflowId(workflow.id);
+    },
+
+    async listWorkflowExecutionHistory({
+      actor,
+      project_id,
+      workflow_id,
+      status = null,
+      trigger_source = null,
+      started_by = null,
+      limit = 50,
+      cursor = null
+    } = {}) {
+      const { project } = await authorizeProjectAction({
+        actor,
+        projectRepository,
+        membershipRepository,
+        project_id,
+        permission: PROJECT_PERMISSIONS.READ_WORKFLOW
+      });
+      const workflow = await requireWorkflow({
+        workflowRepository,
+        workflow_id,
+        project_id: project.id
+      });
+
+      return createWorkflowExecutionHistory({
+        executions: await executionRepository.findByWorkflowId(workflow.id),
+        status,
+        trigger_source,
+        started_by,
+        limit,
+        cursor
+      });
     }
   });
 }
@@ -398,6 +539,29 @@ function assertNodeBelongsToExecutionPlan({
       }
     );
   }
+}
+
+function requireNodeRun({
+  execution,
+  node_id,
+  attempt
+}) {
+  const nodeId = typeof node_id === "string" ? node_id.trim() : "";
+  const nodeRun = execution.node_runs.find(
+    (entry) => entry.node_id === nodeId && entry.attempt === attempt
+  );
+
+  if (!nodeRun) {
+    throw new WorkflowExecutionValidationError(
+      `Execution does not contain node run "${nodeId}" attempt ${attempt}.`,
+      {
+        code: "workflow_execution_node_run_not_found",
+        details: { execution_id: execution.id, node_id: nodeId, attempt }
+      }
+    );
+  }
+
+  return nodeRun;
 }
 
 function deriveExecutionState({

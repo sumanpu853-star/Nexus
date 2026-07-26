@@ -5,6 +5,7 @@ import { createWorkflowExecutionService } from "../../src/application/workflowEx
 import { PROJECT_ROLES } from "../../src/domain/securityPolicy.js";
 import {
   WORKFLOW_EXECUTION_STATUSES,
+  WORKFLOW_NODE_LOG_LEVELS,
   WORKFLOW_NODE_RUN_STATUSES,
   WORKFLOW_TRIGGER_SOURCES
 } from "../../src/domain/workflowExecutionPolicy.js";
@@ -149,6 +150,82 @@ test("queuePartialWorkflowExecution queues only the failed node and downstream s
   assert.deepEqual(
     partial.node_runs.map((nodeRun) => nodeRun.node_id),
     ["http", "notify"]
+  );
+});
+
+test("recordNodeRunLog stores redacted node-level logs and starts queued runs", async () => {
+  const { workflow, executionService } = await createWorkflowFixture();
+  const execution = await executionService.queueWorkflowExecution({
+    actor: { id: "owner_1" },
+    project_id: workflow.project_id,
+    workflow_id: workflow.id
+  });
+
+  const updated = await executionService.recordNodeRunLog({
+    actor: { id: "owner_1" },
+    project_id: workflow.project_id,
+    execution_id: execution.id,
+    node_id: "http",
+    level: WORKFLOW_NODE_LOG_LEVELS.INFO,
+    message: "Calling API with secret-token",
+    metadata: {
+      authorization: "Bearer secret-token",
+      attempt: 1
+    },
+    secretValues: ["secret-token"]
+  });
+  const httpRun = updated.node_runs.find((nodeRun) => nodeRun.node_id === "http");
+
+  assert.equal(updated.status, WORKFLOW_EXECUTION_STATUSES.RUNNING);
+  assert.equal(httpRun.status, WORKFLOW_NODE_RUN_STATUSES.RUNNING);
+  assert.equal(httpRun.logs[0].message, "Calling API with [REDACTED]");
+  assert.deepEqual(httpRun.logs[0].metadata, {
+    authorization: "[REDACTED]",
+    attempt: 1
+  });
+});
+
+test("listWorkflowExecutionHistory and getWorkflowExecutionTimeline expose execution diagnostics", async () => {
+  const { workflow, executionService } = await createWorkflowFixture();
+  const execution = await executionService.queueWorkflowExecution({
+    actor: { id: "owner_1" },
+    project_id: workflow.project_id,
+    workflow_id: workflow.id
+  });
+  const running = await executionService.recordNodeRunLog({
+    actor: { id: "owner_1" },
+    project_id: workflow.project_id,
+    execution_id: execution.id,
+    node_id: "http",
+    message: "Calling API"
+  });
+  await executionService.recordNodeRunResult({
+    actor: { id: "owner_1" },
+    project_id: workflow.project_id,
+    execution_id: running.id,
+    node_id: "http",
+    status: WORKFLOW_NODE_RUN_STATUSES.FAILED,
+    error: "HTTP 500"
+  });
+
+  const history = await executionService.listWorkflowExecutionHistory({
+    actor: { id: "viewer_1" },
+    project_id: workflow.project_id,
+    workflow_id: workflow.id,
+    status: WORKFLOW_EXECUTION_STATUSES.FAILED
+  });
+  const timeline = await executionService.getWorkflowExecutionTimeline({
+    actor: { id: "viewer_1" },
+    project_id: workflow.project_id,
+    execution_id: execution.id
+  });
+
+  assert.equal(history.items.length, 1);
+  assert.equal(history.items[0].failed_node_id, "http");
+  assert.equal(history.items[0].log_count, 1);
+  assert.deepEqual(
+    timeline.events.map((event) => event.type),
+    ["execution_queued", "node_started", "node_log", "node_finished", "execution_finished"]
   );
 });
 

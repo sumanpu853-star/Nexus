@@ -50,7 +50,7 @@ Fix the current blockers first:
 
 ### Phase 3: Execution Platform
 
-- Store every execution with status, duration, `started_by`, trigger type, per-node input/output, and error. Foundation implemented with project-scoped execution records, node run snapshots, failure status, and redaction.
+- Store every execution with status, duration, `started_by`, trigger type, per-node input/output, and error. Foundation implemented with project-scoped execution records, node run snapshots, failure status, redaction, summarized history, node-level logs, diagnostic timelines, and HTTP handlers.
 - Add retry policies, timeout policies, and error branches. Node-level retry/timeout policy validation and error branch planning are implemented before execution runner work.
 - Add manual, production, and webhook execution modes. Mode and trigger validation are implemented at the execution record boundary.
 
@@ -146,6 +146,7 @@ These implementation foundations are completed so far:
 | Workflow DAG validation before persistence | Completed |
 | Workflow node retry and timeout policy validation before persistence | Completed |
 | Workflow error branches, execution records, and partial rerun planning | Completed |
+| P1 execution history summaries, node-level logs, timelines, and failed-node rerun routes | Completed |
 | Schema-driven node catalog and workflow node parameter validation | Completed |
 | Workflow templates and builder form contract | Completed |
 

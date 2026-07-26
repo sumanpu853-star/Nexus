@@ -15,6 +15,13 @@ export const WORKFLOW_NODE_RUN_STATUSES = Object.freeze({
   CANCELLED: "cancelled"
 });
 
+export const WORKFLOW_NODE_LOG_LEVELS = Object.freeze({
+  DEBUG: "debug",
+  INFO: "info",
+  WARN: "warn",
+  ERROR: "error"
+});
+
 export const WORKFLOW_TRIGGER_SOURCES = Object.freeze({
   MANUAL: "manual",
   WEBHOOK: "webhook",
@@ -101,7 +108,7 @@ export function createWorkflowExecutionRecord({
     output: normalizeNullablePlainObject(output, "Execution output"),
     error: normalizeNullableError(error, "Execution error"),
     failed_node_id: normalizeNullableString(failed_node_id, "Execution failed_node_id"),
-    node_runs: normalizeArray(node_runs, "Execution node_runs"),
+    node_runs: normalizeNodeRunArray(node_runs, "Execution node_runs"),
     plan: normalizePlainObject(plan, "Execution plan"),
     metadata: normalizePlainObject(metadata, "Execution metadata"),
     started_at: normalizeTimestamp(started_at, "Execution started_at"),
@@ -121,6 +128,7 @@ export function createWorkflowNodeRunRecord({
   input = null,
   output = null,
   error = null,
+  logs = [],
   started_at = null,
   finished_at = null,
   duration_ms = null
@@ -134,9 +142,30 @@ export function createWorkflowNodeRunRecord({
     input: normalizeNullablePlainObject(input, "Node run input"),
     output: normalizeNullablePlainObject(output, "Node run output"),
     error: normalizeNullableError(error, "Node run error"),
+    logs: normalizeNodeRunLogs(logs, "Node run logs"),
     started_at: normalizeNullableTimestamp(started_at, "Node run started_at"),
     finished_at: normalizeNullableTimestamp(finished_at, "Node run finished_at"),
     duration_ms: normalizeNullableNonNegativeInteger(duration_ms, "Node run duration_ms")
+  });
+}
+
+export function createWorkflowNodeLogRecord({
+  id,
+  execution_id,
+  node_id,
+  level = WORKFLOW_NODE_LOG_LEVELS.INFO,
+  message,
+  timestamp,
+  metadata = {}
+} = {}) {
+  return deepFreeze({
+    id: normalizeRequiredString(id, "Node log id"),
+    execution_id: normalizeRequiredString(execution_id, "Node log execution_id"),
+    node_id: normalizeRequiredString(node_id, "Node log node_id"),
+    level: normalizeEnum(level, WORKFLOW_NODE_LOG_LEVELS, "Node log level"),
+    message: normalizeRequiredString(message, "Node log message"),
+    timestamp: normalizeTimestamp(timestamp, "Node log timestamp"),
+    metadata: normalizePlainObject(metadata, "Node log metadata")
   });
 }
 
@@ -268,12 +297,20 @@ function normalizeNullableError(value, field) {
   return normalizePlainObject(value, field);
 }
 
-function normalizeArray(value, field) {
+function normalizeNodeRunArray(value, field) {
   if (!Array.isArray(value)) {
     throw new WorkflowExecutionValidationError(`${field} must be an array.`);
   }
 
-  return value.map((entry) => deepClone(entry));
+  return value.map((entry) => createWorkflowNodeRunRecord(entry));
+}
+
+function normalizeNodeRunLogs(value, field) {
+  if (!Array.isArray(value)) {
+    throw new WorkflowExecutionValidationError(`${field} must be an array.`);
+  }
+
+  return value.map((entry) => createWorkflowNodeLogRecord(entry));
 }
 
 function deepClone(value) {
