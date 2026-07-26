@@ -199,6 +199,14 @@
         "guidance": "Keep execution metrics, cost, token, trace, and latency aggregation in the domain layer."
       },
       {
+        "id": "knowledge-base-policy-domain",
+        "title": "Knowledge base policy domain exists",
+        "target": "src/domain/knowledgeBasePolicy.js",
+        "kind": "fileExists",
+        "severity": "required",
+        "guidance": "Keep RAG knowledge base, chunking, search result, and vector write rules in the domain layer."
+      },
+      {
         "id": "application-layer",
         "title": "Application layer directory exists",
         "target": "src/application",
@@ -263,6 +271,14 @@
         "guidance": "Keep credential vault use cases project-scoped and permission-checked."
       },
       {
+        "id": "knowledge-base-service",
+        "title": "Knowledge base service exists",
+        "target": "src/application/knowledgeBaseService.js",
+        "kind": "fileExists",
+        "severity": "required",
+        "guidance": "Keep RAG ingestion and search project-scoped and adapter-backed."
+      },
+      {
         "id": "interfaces-layer",
         "title": "Interfaces layer directory exists",
         "target": "src/interfaces",
@@ -301,6 +317,14 @@
         "kind": "fileExists",
         "severity": "required",
         "guidance": "Keep execution history, timeline, logging, and rerun routes in the interface layer."
+      },
+      {
+        "id": "knowledge-base-http-handler",
+        "title": "Knowledge base HTTP handler exists",
+        "target": "src/interfaces/knowledgeBaseHttpHandler.js",
+        "kind": "fileExists",
+        "severity": "required",
+        "guidance": "Keep RAG knowledge base routes separate from application orchestration."
       },
       {
         "id": "infrastructure-layer",
@@ -349,6 +373,30 @@
         "kind": "fileExists",
         "severity": "required",
         "guidance": "Keep persistence details behind repository adapters."
+      },
+      {
+        "id": "knowledge-repositories",
+        "title": "Knowledge repositories exist",
+        "target": "src/infrastructure/inMemoryKnowledgeRepositories.js",
+        "kind": "fileExists",
+        "severity": "required",
+        "guidance": "Keep RAG persistence details behind repository adapters."
+      },
+      {
+        "id": "embedding-provider",
+        "title": "Embedding provider adapter exists",
+        "target": "src/infrastructure/deterministicEmbeddingProvider.js",
+        "kind": "fileExists",
+        "severity": "required",
+        "guidance": "Keep embeddings behind a provider boundary so production models can be swapped in."
+      },
+      {
+        "id": "vector-index",
+        "title": "Vector index adapter exists",
+        "target": "src/infrastructure/inMemoryVectorIndex.js",
+        "kind": "fileExists",
+        "severity": "required",
+        "guidance": "Keep vector search behind an adapter with explicit append, upsert, and replace modes."
       },
       {
         "id": "tests-directory",

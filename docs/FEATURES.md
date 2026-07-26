@@ -20,7 +20,7 @@ In simple terms: n8n-style automation plus Botpress-style AI agents, with produc
 | Credentials | Encrypted vault, credential ownership, credential sharing, external secret provider support | P0 | Completed |
 | Builder UX | Schema-driven node forms instead of raw JSON textareas | P0 | Completed |
 | Executions | Execution history, node-level logs, input/output snapshots, rerun from failed node | P1 | In progress |
-| RAG | Knowledge base manager, document ingestion, chunking, embedding, vector search, reranking | P1 | Planned |
+| RAG | Knowledge base manager, document ingestion, chunking, embedding, vector search, reranking | P1 | In progress |
 | AI Agents | Agent node with tools, memory, model selection, prompt/instruction editor, tool-call visibility | P1 | Planned |
 | Integrations | HTTP, Slack/Teams, Gmail/Outlook, Google Drive, GitHub, databases, webhooks, schedules | P1 | Planned |
 | Deployment | Save/publish states, webhook URLs, environment variables, dev/stage/prod separation | P1 | Planned |
@@ -117,6 +117,22 @@ Each execution should track:
 - duration, token usage, cost, and trace spans
 - error message and failed node ID
 
+### Knowledge Base Object
+
+Each knowledge base should include:
+
+- `id`
+- `project_id`
+- `owner_id`
+- `name`
+- `description`
+- `embedding_model`
+- `chunking`
+- `created_at`
+- `updated_at`
+
+Each ingested document should include source metadata, content hash, chunks, embedding references, and project-scoped vector search records.
+
 ## Differentiating Features
 
 Nexus should stand out through:
@@ -148,6 +164,7 @@ These implementation foundations are completed so far:
 | Workflow error branches, execution records, and partial rerun planning | Completed |
 | P1 execution history summaries, node-level logs, timelines, and failed-node rerun routes | Completed |
 | P1 execution token/cost rollups, trace spans, metrics, and observability report route | Completed |
+| P1 RAG knowledge base manager, ingestion/chunking, embedding boundary, vector search, reranking hooks, and knowledge search node schema | Completed |
 | Schema-driven node catalog and workflow node parameter validation | Completed |
 | Workflow templates and builder form contract | Completed |
 

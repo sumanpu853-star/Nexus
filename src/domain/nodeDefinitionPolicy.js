@@ -174,6 +174,60 @@ const BUILT_IN_NODE_DEFINITIONS = deepFreeze([
     availability: { status: "available" }
   }),
   createNodeDefinition({
+    type: "knowledge_search",
+    label: "Knowledge Search",
+    category: NODE_CATEGORIES.AI,
+    icon: "search",
+    input_handles: [{ id: "main", label: "Main" }],
+    output_handles: [{ id: "main", label: "Main" }],
+    parameter_schema: {
+      fields: [
+        {
+          name: "knowledge_base_id",
+          label: "Knowledge Base",
+          type: NODE_PARAMETER_TYPES.STRING,
+          control: NODE_PARAMETER_CONTROLS.TEXT,
+          required: true
+        },
+        {
+          name: "query",
+          label: "Query",
+          type: NODE_PARAMETER_TYPES.STRING,
+          control: NODE_PARAMETER_CONTROLS.TEXTAREA,
+          required: true
+        },
+        {
+          name: "limit",
+          label: "Limit",
+          type: NODE_PARAMETER_TYPES.INTEGER,
+          control: NODE_PARAMETER_CONTROLS.NUMBER,
+          required: false,
+          default: 5
+        },
+        {
+          name: "rerank",
+          label: "Rerank",
+          type: NODE_PARAMETER_TYPES.BOOLEAN,
+          control: NODE_PARAMETER_CONTROLS.TOGGLE,
+          required: false,
+          default: true
+        },
+        {
+          name: "filters",
+          label: "Filters",
+          type: NODE_PARAMETER_TYPES.OBJECT,
+          control: NODE_PARAMETER_CONTROLS.KEY_VALUE,
+          required: false,
+          default: {}
+        }
+      ]
+    },
+    credential_requirements: [],
+    execution: { supports_timeout: true, supports_retry: true },
+    redaction: { parameter_keys: [] },
+    availability: { status: "available" }
+  }),
+  createNodeDefinition({
     type: "python_script",
     label: "Python Script",
     category: NODE_CATEGORIES.CODE,

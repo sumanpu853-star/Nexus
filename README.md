@@ -14,6 +14,7 @@ Nexus is an architecture-first codebase baseline with a small Node.js CLI for re
 - P0 workflow engine foundation covers DAG validation, branching/joins, retry/timeout defaults, error branches, execution records, and partial rerun planning.
 - P0 builder UX foundation covers schema-driven node definitions, workflow node parameter validation, templates, node forms, and catalog handlers.
 - P1 execution diagnostics now include summarized execution lists, node-level logs, diagnostic timelines, token/cost rollups, trace spans, observability reports, detail routes, and failed-node rerun routes.
+- P1 RAG foundation covers project-scoped knowledge bases, document ingestion, chunking, deterministic embedding boundaries, vector search, reranking hooks, and a knowledge search node definition.
 - The LanceDB overwrite blocker was audited and is not applicable until vector-store code is introduced.
 - CI runs tests and the architecture review on pushes and pull requests.
 
@@ -43,6 +44,7 @@ Nexus is an architecture-first codebase baseline with a small Node.js CLI for re
 - `docs/decisions/0016-p0-foundation-completion.md` records the P0 completion boundary.
 - `docs/decisions/0017-p1-execution-history-and-logs.md` records the first P1 execution diagnostics decision.
 - `docs/decisions/0018-p1-execution-observability.md` records the token, cost, trace, and metrics decision.
+- `docs/decisions/0019-p1-rag-foundation.md` records the RAG knowledge base and vector adapter decision.
 - `nexus.config.json` defines the architecture checks used by the CLI and CI.
 - `src/` reserves the future production-code boundaries.
 - `tests/` reserves the future verification boundaries.
@@ -96,4 +98,4 @@ npm run print:config-schema
 
 ## Next Step
 
-Continue P1 from `docs/FEATURES.md`: move to RAG, then AI agents, integrations, deployment, and remaining observability dashboards.
+Continue P1 from `docs/FEATURES.md`: move to AI agents, integrations, deployment, and remaining observability dashboards.

@@ -18,10 +18,16 @@ test("node definition policy exposes built-in schema-driven node definitions", (
     type: "http_request",
     nodeDefinitions: definitions
   });
+  const knowledgeSearch = findNodeDefinitionByType({
+    type: "knowledge_search",
+    nodeDefinitions: definitions
+  });
 
-  assert.equal(definitions.length >= 5, true);
+  assert.equal(definitions.length >= 6, true);
   assert.equal(http.label, "HTTP Request");
   assert.equal(http.category, NODE_CATEGORIES.ACTION);
+  assert.equal(knowledgeSearch.category, NODE_CATEGORIES.AI);
+  assert.equal(knowledgeSearch.availability.status, "available");
   assert.deepEqual(
     http.parameter_schema.fields.map((field) => [field.name, field.type, field.control]),
     [
@@ -33,6 +39,29 @@ test("node definition policy exposes built-in schema-driven node definitions", (
     ]
   );
   assert.equal(Object.isFrozen(http.parameter_schema.fields[0]), true);
+});
+
+test("node definition policy exposes knowledge search form defaults", () => {
+  const normalized = applyWorkflowNodeDefinitionDefaults({
+    nodes: [
+      {
+        id: "search",
+        type: "knowledge_search",
+        parameters: {
+          knowledge_base_id: "knowledge_base_1",
+          query: "reset password"
+        }
+      }
+    ]
+  });
+
+  assert.deepEqual(normalized[0].parameters, {
+    knowledge_base_id: "knowledge_base_1",
+    query: "reset password",
+    limit: 5,
+    rerank: true,
+    filters: {}
+  });
 });
 
 test("node definition policy applies labels, parameters, and credential defaults", () => {
