@@ -17,6 +17,7 @@ Nexus is an architecture-first codebase baseline with a small Node.js CLI for re
 - P1 RAG foundation covers project-scoped knowledge bases, document ingestion, chunking, deterministic embedding boundaries, vector search, reranking hooks, and a knowledge search node definition.
 - P1 AI agent foundation covers project-scoped agents, model selection, prompt versions, memory scopes, tool permissions, deterministic model adapters, and visible tool-call records.
 - P1 integrations foundation covers integration catalog, project-scoped connections, credential binding, deterministic gateway, webhooks, schedules, and node schemas.
+- P1 deployment foundation covers dev/stage/prod environments, safe environment variables, publish records, active deployment lookup, and stable webhook URLs.
 - The LanceDB overwrite blocker was audited and is not applicable until vector-store code is introduced.
 - CI runs tests and the architecture review on pushes and pull requests.
 
@@ -49,6 +50,7 @@ Nexus is an architecture-first codebase baseline with a small Node.js CLI for re
 - `docs/decisions/0019-p1-rag-foundation.md` records the RAG knowledge base and vector adapter decision.
 - `docs/decisions/0020-p1-ai-agent-foundation.md` records the agent, memory, model, and tool-permission decision.
 - `docs/decisions/0021-p1-integration-foundation.md` records the integration catalog, connection, trigger, and gateway decision.
+- `docs/decisions/0022-p1-deployment-foundation.md` records the deployment environment, publish, and webhook URL decision.
 - `nexus.config.json` defines the architecture checks used by the CLI and CI.
 - `src/` reserves the future production-code boundaries.
 - `tests/` reserves the future verification boundaries.
@@ -102,4 +104,4 @@ npm run print:config-schema
 
 ## Next Step
 
-Continue P1 from `docs/FEATURES.md`: move to deployment and remaining observability dashboards.
+Continue P1 from `docs/FEATURES.md`: finish remaining observability dashboards and production adapters.

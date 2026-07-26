@@ -223,6 +223,14 @@
         "guidance": "Keep integration definitions, connections, invocations, webhook, and schedule rules in the domain layer."
       },
       {
+        "id": "deployment-policy-domain",
+        "title": "Deployment policy domain exists",
+        "target": "src/domain/deploymentPolicy.js",
+        "kind": "fileExists",
+        "severity": "required",
+        "guidance": "Keep deployment environments, variables, publish records, and webhook URL rules in the domain layer."
+      },
+      {
         "id": "application-layer",
         "title": "Application layer directory exists",
         "target": "src/application",
@@ -311,6 +319,14 @@
         "guidance": "Keep integration connection, invocation, webhook, and schedule orchestration project-scoped."
       },
       {
+        "id": "deployment-service",
+        "title": "Deployment service exists",
+        "target": "src/application/deploymentService.js",
+        "kind": "fileExists",
+        "severity": "required",
+        "guidance": "Keep deployment environment configuration and workflow publishing project-scoped."
+      },
+      {
         "id": "interfaces-layer",
         "title": "Interfaces layer directory exists",
         "target": "src/interfaces",
@@ -373,6 +389,14 @@
         "kind": "fileExists",
         "severity": "required",
         "guidance": "Keep integration delivery routes separate from application orchestration."
+      },
+      {
+        "id": "deployment-http-handler",
+        "title": "Deployment HTTP handler exists",
+        "target": "src/interfaces/deploymentHttpHandler.js",
+        "kind": "fileExists",
+        "severity": "required",
+        "guidance": "Keep deployment delivery routes separate from application orchestration."
       },
       {
         "id": "infrastructure-layer",
@@ -485,6 +509,14 @@
         "kind": "fileExists",
         "severity": "required",
         "guidance": "Keep integration calls behind a gateway boundary so production adapters can be swapped in."
+      },
+      {
+        "id": "deployment-repositories",
+        "title": "Deployment repositories exist",
+        "target": "src/infrastructure/inMemoryDeploymentRepositories.js",
+        "kind": "fileExists",
+        "severity": "required",
+        "guidance": "Keep deployment persistence details behind repository adapters."
       },
       {
         "id": "tests-directory",

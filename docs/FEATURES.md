@@ -23,7 +23,7 @@ In simple terms: n8n-style automation plus Botpress-style AI agents, with produc
 | RAG | Knowledge base manager, document ingestion, chunking, embedding, vector search, reranking | P1 | In progress |
 | AI Agents | Agent node with tools, memory, model selection, prompt/instruction editor, tool-call visibility | P1 | In progress |
 | Integrations | HTTP, Slack/Teams, Gmail/Outlook, Google Drive, GitHub, databases, webhooks, schedules | P1 | In progress |
-| Deployment | Save/publish states, webhook URLs, environment variables, dev/stage/prod separation | P1 | Planned |
+| Deployment | Save/publish states, webhook URLs, environment variables, dev/stage/prod separation | P1 | In progress |
 | Observability | Logs, traces, metrics, cost tracking, token usage, latency, failure-rate dashboards | P1 | In progress |
 | Collaboration | Workflow versions, compare, restore, comments, templates, import/export | P2 | Planned |
 | Human-in-loop | Approval node, manual review queue, human handoff, timeout/fallback path | P2 | Planned |
@@ -171,6 +171,32 @@ Each integration invocation should track the connection, action, input, output, 
 
 Webhook endpoints should map a project workflow to a stable path with optional connection and secret references. Schedule triggers should map a project workflow to a cron expression and timezone.
 
+### Deployment Object
+
+Each deployment environment should include:
+
+- `id`
+- `project_id`
+- `environment`
+- `variables`
+- `created_at`
+- `updated_at`
+
+Each deployment should include:
+
+- `id`
+- `project_id`
+- `workflow_id`
+- `workflow_version`
+- `environment`
+- `status`
+- `webhook_url`
+- `variable_snapshot`
+- `created_by`
+- `created_at`
+- `published_at`
+- `disabled_at`
+
 ## Differentiating Features
 
 Nexus should stand out through:
@@ -205,6 +231,7 @@ These implementation foundations are completed so far:
 | P1 RAG knowledge base manager, ingestion/chunking, embedding boundary, vector search, reranking hooks, and knowledge search node schema | Completed |
 | P1 AI agent model selection, prompt versions, memory scopes, tool permissions, deterministic model boundary, and visible tool-call records | Completed |
 | P1 integration catalog, project-scoped connections, credential binding, deterministic gateway, webhook endpoints, schedule triggers, and integration node schemas | Completed |
+| P1 deployment environments, safe environment variable snapshots, publish records, active deployment lookup, stable webhook URLs, and deployment HTTP routes | Completed |
 | Schema-driven node catalog and workflow node parameter validation | Completed |
 | Workflow templates and builder form contract | Completed |
 
