@@ -29,6 +29,7 @@ import {
   createWorkflowExecutionTimeline
 } from "../domain/workflowExecutionHistoryPolicy.js";
 import {
+  createWorkflowExecutionDashboard,
   createWorkflowExecutionObservabilityReport
 } from "../domain/workflowExecutionObservabilityPolicy.js";
 
@@ -411,6 +412,31 @@ export function createWorkflowExecutionService({
 
       return createWorkflowExecutionObservabilityReport({
         executions: await executionRepository.findByWorkflowId(workflow.id)
+      });
+    },
+
+    async getWorkflowExecutionDashboard({
+      actor,
+      project_id,
+      workflow_id,
+      filters = {}
+    } = {}) {
+      const { project } = await authorizeProjectAction({
+        actor,
+        projectRepository,
+        membershipRepository,
+        project_id,
+        permission: PROJECT_PERMISSIONS.READ_WORKFLOW
+      });
+      const workflow = await requireWorkflow({
+        workflowRepository,
+        workflow_id,
+        project_id: project.id
+      });
+
+      return createWorkflowExecutionDashboard({
+        executions: await executionRepository.findByWorkflowId(workflow.id),
+        filters
       });
     },
 

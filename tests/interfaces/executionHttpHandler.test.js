@@ -159,6 +159,16 @@ test("execution http handler records result metrics and exposes observability", 
       project_id: workflow.project_id
     }
   });
+  const dashboard = await handler.handle({
+    actor: { id: "viewer_1" },
+    method: "GET",
+    path: `/workflows/${workflow.id}/executions/dashboard`,
+    query: {
+      project_id: workflow.project_id,
+      status: WORKFLOW_EXECUTION_STATUSES.FAILED,
+      node_id: "http"
+    }
+  });
 
   assert.equal(result.status, 200);
   assert.deepEqual(result.body.execution.usage, {
@@ -173,6 +183,9 @@ test("execution http handler records result metrics and exposes observability", 
     amount: 0.003,
     currency: "USD"
   });
+  assert.equal(dashboard.status, 200);
+  assert.equal(dashboard.body.dashboard.execution_count, 1);
+  assert.equal(dashboard.body.dashboard.top_failing_nodes[0].node_id, "http");
 });
 
 async function createExecutionHandlerFixture() {

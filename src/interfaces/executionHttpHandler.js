@@ -21,6 +21,33 @@ export function createExecutionHttpHandler({
           segments.length === 4 &&
           segments[0] === "workflows" &&
           segments[2] === "executions" &&
+          segments[3] === "dashboard"
+        ) {
+          const query = normalizeQuery(request.query);
+
+          return jsonResponse(200, {
+            dashboard: await workflowExecutionService.getWorkflowExecutionDashboard({
+              actor: request.actor,
+              project_id: query.project_id,
+              workflow_id: segments[1],
+              filters: {
+                status: query.status,
+                trigger_source: query.trigger_source,
+                mode: query.mode,
+                started_by: query.started_by,
+                node_id: query.node_id,
+                since: query.since,
+                until: query.until
+              }
+            })
+          });
+        }
+
+        if (
+          method === "GET" &&
+          segments.length === 4 &&
+          segments[0] === "workflows" &&
+          segments[2] === "executions" &&
           segments[3] === "observability"
         ) {
           const query = normalizeQuery(request.query);
@@ -184,6 +211,7 @@ export function createExecutionHttpHandler({
 function assertExecutionService(workflowExecutionService) {
   for (const method of [
     "getWorkflowExecution",
+    "getWorkflowExecutionDashboard",
     "getWorkflowExecutionObservability",
     "getWorkflowExecutionTimeline",
     "listWorkflowExecutionHistory",

@@ -24,7 +24,7 @@ In simple terms: n8n-style automation plus Botpress-style AI agents, with produc
 | AI Agents | Agent node with tools, memory, model selection, prompt/instruction editor, tool-call visibility | P1 | In progress |
 | Integrations | HTTP, Slack/Teams, Gmail/Outlook, Google Drive, GitHub, databases, webhooks, schedules | P1 | In progress |
 | Deployment | Save/publish states, webhook URLs, environment variables, dev/stage/prod separation | P1 | In progress |
-| Observability | Logs, traces, metrics, cost tracking, token usage, latency, failure-rate dashboards | P1 | In progress |
+| Observability | Logs, traces, metrics, cost tracking, token usage, latency, failure-rate dashboards | P1 | Completed |
 | Collaboration | Workflow versions, compare, restore, comments, templates, import/export | P2 | Planned |
 | Human-in-loop | Approval node, manual review queue, human handoff, timeout/fallback path | P2 | Planned |
 | Marketplace | Plugin SDK, custom node packaging, verified community nodes, private nodes | P2 | Planned |
@@ -228,6 +228,7 @@ These implementation foundations are completed so far:
 | Workflow error branches, execution records, and partial rerun planning | Completed |
 | P1 execution history summaries, node-level logs, timelines, and failed-node rerun routes | Completed |
 | P1 execution token/cost rollups, trace spans, metrics, and observability report route | Completed |
+| P1 observability dashboard filters, latency buckets, status breakdowns, failure rankings, slowest-node summaries, and cost/token breakdowns | Completed |
 | P1 RAG knowledge base manager, ingestion/chunking, embedding boundary, vector search, reranking hooks, and knowledge search node schema | Completed |
 | P1 AI agent model selection, prompt versions, memory scopes, tool permissions, deterministic model boundary, and visible tool-call records | Completed |
 | P1 integration catalog, project-scoped connections, credential binding, deterministic gateway, webhook endpoints, schedule triggers, and integration node schemas | Completed |

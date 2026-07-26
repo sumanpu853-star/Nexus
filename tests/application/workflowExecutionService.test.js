@@ -330,6 +330,60 @@ test("getWorkflowExecutionObservability exposes aggregate metrics to project vie
   assert.equal(observability.node_metrics[0].node_id, "http");
 });
 
+test("getWorkflowExecutionDashboard exposes filtered dashboard data to project viewers", async () => {
+  const { workflow, executionService } = await createWorkflowFixture();
+  const execution = await executionService.queueWorkflowExecution({
+    actor: { id: "owner_1" },
+    project_id: workflow.project_id,
+    workflow_id: workflow.id,
+    trigger_source: WORKFLOW_TRIGGER_SOURCES.WEBHOOK
+  });
+  await executionService.recordNodeRunResult({
+    actor: { id: "owner_1" },
+    project_id: workflow.project_id,
+    execution_id: execution.id,
+    node_id: "http",
+    status: WORKFLOW_NODE_RUN_STATUSES.FAILED,
+    error: "HTTP 500",
+    usage: {
+      input_tokens: 10,
+      output_tokens: 2
+    },
+    cost: {
+      amount: 0.001
+    }
+  });
+
+  const dashboard = await executionService.getWorkflowExecutionDashboard({
+    actor: { id: "viewer_1" },
+    project_id: workflow.project_id,
+    workflow_id: workflow.id,
+    filters: {
+      status: WORKFLOW_EXECUTION_STATUSES.FAILED,
+      node_id: "http"
+    }
+  });
+
+  assert.equal(dashboard.execution_count, 1);
+  assert.equal(dashboard.summary.failure_rate, 1);
+  assert.equal(dashboard.top_failing_nodes[0].node_id, "http");
+  assert.deepEqual(dashboard.token_usage_by_status.failed, {
+    input_tokens: 10,
+    output_tokens: 2,
+    total_tokens: 12
+  });
+  await assert.rejects(
+    () =>
+      executionService.getWorkflowExecutionDashboard({
+        actor: { id: "viewer_1" },
+        project_id: workflow.project_id,
+        workflow_id: workflow.id,
+        filters: { status: "done" }
+      }),
+    /not supported/
+  );
+});
+
 test("listWorkflowExecutions allows project viewers to inspect execution history", async () => {
   const { workflow, executionService } = await createWorkflowFixture();
   await executionService.queueWorkflowExecution({

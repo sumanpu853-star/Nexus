@@ -367,6 +367,18 @@
         "guidance": "Keep execution history, timeline, logging, and rerun routes in the interface layer."
       },
       {
+        "id": "execution-dashboard-route",
+        "title": "Execution dashboard route exists",
+        "target": "src/interfaces/executionHttpHandler.js",
+        "kind": "contentIncludes",
+        "severity": "required",
+        "expected": [
+          "getWorkflowExecutionDashboard",
+          "dashboard"
+        ],
+        "guidance": "Keep dashboard-ready observability available through the execution interface boundary."
+      },
+      {
         "id": "knowledge-base-http-handler",
         "title": "Knowledge base HTTP handler exists",
         "target": "src/interfaces/knowledgeBaseHttpHandler.js",
