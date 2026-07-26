@@ -127,6 +127,14 @@
         "guidance": "Keep DAG validation in the domain layer before adding execution runners."
       },
       {
+        "id": "workflow-node-execution-policy-domain",
+        "title": "Workflow node execution policy domain exists",
+        "target": "src/domain/workflowNodeExecutionPolicy.js",
+        "kind": "fileExists",
+        "severity": "required",
+        "guidance": "Keep retry and timeout policy validation in the domain layer before adding execution runners."
+      },
+      {
         "id": "application-layer",
         "title": "Application layer directory exists",
         "target": "src/application",

@@ -60,6 +60,13 @@ test("createWorkflow requires project membership with write permission", async (
 
   assert.equal(workflow.project_id, project.id);
   assert.equal(workflow.owner_id, "owner_1");
+  assert.equal(workflow.nodes[0].timeout_ms, 30000);
+  assert.deepEqual(workflow.nodes[0].retry_policy, {
+    max_attempts: 1,
+    backoff: "fixed",
+    initial_delay_ms: 0,
+    max_delay_ms: 0
+  });
   await assert.rejects(
     () =>
       service.createWorkflow({
@@ -166,6 +173,91 @@ test("createWorkflow rejects cyclic workflow graphs", async () => {
     (error) => {
       assert.equal(error.name, "WorkflowGraphValidationError");
       assert.equal(error.violations[0].type, "cycle");
+      return true;
+    }
+  );
+  assert.deepEqual(await repositories.workflows.findByProjectId(project.id), []);
+});
+
+test("createWorkflow persists explicit retry and timeout policies", async () => {
+  const repositories = createInMemorySecurityRepositories();
+  const service = createProjectWorkflowSecurityService({
+    projectRepository: repositories.projects,
+    membershipRepository: repositories.memberships,
+    workflowRepository: repositories.workflows,
+    idGenerator: sequenceIds(),
+    clock: () => new Date(timestamp)
+  });
+  const { project } = await service.createProjectForUser({
+    actor: { id: "owner_1" },
+    name: "AI Workflows"
+  });
+
+  const workflow = await service.createWorkflow({
+    actor: { id: "owner_1" },
+    project_id: project.id,
+    name: "Retrying HTTP Workflow",
+    nodes: [
+      {
+        id: "http",
+        type: "http_request",
+        timeout_ms: 15_000,
+        retry_policy: {
+          max_attempts: 3,
+          backoff: "exponential",
+          initial_delay_ms: 2_000,
+          max_delay_ms: 20_000
+        }
+      }
+    ]
+  });
+
+  assert.equal(workflow.nodes[0].timeout_ms, 15_000);
+  assert.deepEqual(workflow.nodes[0].retry_policy, {
+    max_attempts: 3,
+    backoff: "exponential",
+    initial_delay_ms: 2_000,
+    max_delay_ms: 20_000
+  });
+});
+
+test("createWorkflow rejects invalid retry and timeout policies before persistence", async () => {
+  const repositories = createInMemorySecurityRepositories();
+  const service = createProjectWorkflowSecurityService({
+    projectRepository: repositories.projects,
+    membershipRepository: repositories.memberships,
+    workflowRepository: repositories.workflows,
+    idGenerator: sequenceIds(),
+    clock: () => new Date(timestamp)
+  });
+  const { project } = await service.createProjectForUser({
+    actor: { id: "owner_1" },
+    name: "AI Workflows"
+  });
+
+  await assert.rejects(
+    () =>
+      service.createWorkflow({
+        actor: { id: "owner_1" },
+        project_id: project.id,
+        name: "Invalid Runtime Policy",
+        nodes: [
+          {
+            id: "http",
+            type: "http_request",
+            timeout_ms: 0,
+            retry_policy: {
+              max_attempts: 10
+            }
+          }
+        ]
+      }),
+    (error) => {
+      assert.equal(error.name, "WorkflowNodeExecutionPolicyError");
+      assert.deepEqual(
+        error.violations.map((violation) => violation.type),
+        ["timeout_out_of_range", "retry_attempts_out_of_range"]
+      );
       return true;
     }
   );

@@ -51,7 +51,7 @@ Fix the current blockers first:
 ### Phase 3: Execution Platform
 
 - Store every execution with status, duration, `started_by`, trigger type, per-node input/output, and error.
-- Add retry policies, timeout policies, and error branches.
+- Add retry policies, timeout policies, and error branches. Node-level retry and timeout policy validation and defaults are implemented before execution runner work.
 - Add manual, production, and webhook execution modes.
 
 ### Phase 4: AI Agent Layer
@@ -140,6 +140,7 @@ These items were completed before this product roadmap replaced the placeholder 
 | Project-scoped encrypted credential vault and redaction core | Completed |
 | Disabled `python_script` workflow nodes until sandboxed runner exists | Completed |
 | Workflow DAG validation before persistence | Completed |
+| Workflow node retry and timeout policy validation before persistence | Completed |
 
 ## Implementation Rule
 

@@ -8,6 +8,7 @@ import {
   createWorkflowRecord
 } from "../domain/securityPolicy.js";
 import { assertWorkflowNodesSafe } from "../domain/executionSafetyPolicy.js";
+import { applyWorkflowNodeExecutionPolicyDefaults } from "../domain/workflowNodeExecutionPolicy.js";
 import { assertWorkflowGraphValid } from "../domain/workflowGraphPolicy.js";
 
 export function createProjectWorkflowSecurityService({
@@ -91,8 +92,11 @@ export function createProjectWorkflowSecurityService({
         nodes,
         edges
       });
+      const normalizedNodes = applyWorkflowNodeExecutionPolicyDefaults({
+        nodes
+      });
       assertWorkflowNodesSafe({
-        nodes,
+        nodes: normalizedNodes,
         runnerCapabilities
       });
 
@@ -103,7 +107,7 @@ export function createProjectWorkflowSecurityService({
         description,
         owner_id: actorId,
         project_id: project.id,
-        nodes,
+        nodes: normalizedNodes,
         edges,
         settings,
         created_at: timestamp,
