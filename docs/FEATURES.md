@@ -17,7 +17,7 @@ In simple terms: n8n-style automation plus Botpress-style AI agents, with produc
 | Security | Real auth, JWT/session login, user ownership checks, RBAC, project/workspace isolation | P0 | In progress |
 | Workflow Engine | DAG validation, branching, joins, retries, timeouts, error workflows, partial execution | P0 | Planned |
 | Safe Execution | Replace raw `python_script` execution with a sandboxed code runner or disabled production mode | P0 | Planned |
-| Credentials | Encrypted vault, credential ownership, credential sharing, external secret provider support | P0 | Planned |
+| Credentials | Encrypted vault, credential ownership, credential sharing, external secret provider support | P0 | In progress |
 | Builder UX | Schema-driven node forms instead of raw JSON textareas | P0 | Planned |
 | Executions | Execution history, node-level logs, input/output snapshots, rerun from failed node | P1 | Planned |
 | RAG | Knowledge base manager, document ingestion, chunking, embedding, vector search, reranking | P1 | Planned |
@@ -36,10 +36,10 @@ In simple terms: n8n-style automation plus Botpress-style AI agents, with produc
 Fix the current blockers first:
 
 - Add real authentication. Foundation implemented with password hashing, signed sessions, RBAC roles, and project-scoped workflow access.
-- Scope credentials and workflows by user/project.
+- Scope credentials and workflows by user/project. Foundation implemented with project-scoped workflows and credentials.
 - Disable or sandbox `python_script`.
 - Fix LanceDB overwrite behavior.
-- Add execution redaction so secrets do not leak in logs/results.
+- Add execution redaction so secrets do not leak in logs/results. Foundation implemented with reusable redaction rules.
 
 ### Phase 2: Workflow Builder Upgrade
 
@@ -137,6 +137,7 @@ These items were completed before this product roadmap replaced the placeholder 
 | Enforce architecture dependency boundaries | Completed |
 | Human-friendly architecture failure output | Completed |
 | Framework-neutral auth/session/RBAC/project-workflow isolation core | Completed |
+| Project-scoped encrypted credential vault and redaction core | Completed |
 
 ## Implementation Rule
 

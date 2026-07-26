@@ -95,6 +95,22 @@
         "guidance": "Keep auth, RBAC, and project isolation rules in the domain layer."
       },
       {
+        "id": "credential-policy-domain",
+        "title": "Credential policy domain exists",
+        "target": "src/domain/credentialPolicy.js",
+        "kind": "fileExists",
+        "severity": "required",
+        "guidance": "Keep credential ownership, sharing, and safe projection rules in the domain layer."
+      },
+      {
+        "id": "secret-redaction-domain",
+        "title": "Secret redaction domain exists",
+        "target": "src/domain/secretRedaction.js",
+        "kind": "fileExists",
+        "severity": "required",
+        "guidance": "Keep reusable redaction rules independent from infrastructure."
+      },
+      {
         "id": "application-layer",
         "title": "Application layer directory exists",
         "target": "src/application",
@@ -119,6 +135,14 @@
         "guidance": "Keep workflow ownership and project isolation checks in application orchestration."
       },
       {
+        "id": "credential-vault-service",
+        "title": "Credential vault service exists",
+        "target": "src/application/credentialVaultService.js",
+        "kind": "fileExists",
+        "severity": "required",
+        "guidance": "Keep credential vault use cases project-scoped and permission-checked."
+      },
+      {
         "id": "interfaces-layer",
         "title": "Interfaces layer directory exists",
         "target": "src/interfaces",
@@ -133,6 +157,14 @@
         "kind": "directoryExists",
         "severity": "required",
         "guidance": "Keep concrete integrations behind adapters."
+      },
+      {
+        "id": "secret-cipher",
+        "title": "Secret cipher exists",
+        "target": "src/infrastructure/aesGcmSecretCipher.js",
+        "kind": "fileExists",
+        "severity": "required",
+        "guidance": "Encrypt credential secrets with an authenticated infrastructure adapter."
       },
       {
         "id": "password-hasher",

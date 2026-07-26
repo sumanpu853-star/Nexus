@@ -101,3 +101,38 @@ test("in-memory security repositories update workflow project indexes", async ()
   assert.deepEqual(await repositories.workflows.findByProjectId("project_1"), []);
   assert.equal((await repositories.workflows.findByProjectId("project_2")).length, 1);
 });
+
+test("in-memory security repositories update credential project indexes", async () => {
+  const repositories = createInMemorySecurityRepositories();
+  await repositories.credentials.save({
+    id: "credential_1",
+    name: "GitHub Token",
+    type: "github",
+    project_id: "project_1",
+    owner_id: "user_1",
+    encrypted_secret: "v1.iv.tag.ciphertext",
+    metadata: {},
+    redaction_keys: ["token"],
+    shared_with_user_ids: [],
+    external_ref: null,
+    created_at: "2026-07-26T00:00:00.000Z",
+    updated_at: "2026-07-26T00:00:00.000Z"
+  });
+  await repositories.credentials.save({
+    id: "credential_1",
+    name: "GitHub Token",
+    type: "github",
+    project_id: "project_2",
+    owner_id: "user_1",
+    encrypted_secret: "v1.iv.tag.ciphertext",
+    metadata: {},
+    redaction_keys: ["token"],
+    shared_with_user_ids: [],
+    external_ref: null,
+    created_at: "2026-07-26T00:00:00.000Z",
+    updated_at: "2026-07-26T00:00:00.000Z"
+  });
+
+  assert.deepEqual(await repositories.credentials.findByProjectId("project_1"), []);
+  assert.equal((await repositories.credentials.findByProjectId("project_2")).length, 1);
+});

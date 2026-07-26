@@ -5,6 +5,8 @@ export function createInMemorySecurityRepositories(initialState = {}) {
   const membershipsByProjectId = new Map();
   const workflowsById = new Map();
   const workflowsByProjectId = new Map();
+  const credentialsById = new Map();
+  const credentialsByProjectId = new Map();
 
   for (const user of initialState.users ?? []) {
     saveUser(user);
@@ -20,6 +22,10 @@ export function createInMemorySecurityRepositories(initialState = {}) {
 
   for (const workflow of initialState.workflows ?? []) {
     saveWorkflow(workflow);
+  }
+
+  for (const credential of initialState.credentials ?? []) {
+    saveCredential(credential);
   }
 
   return Object.freeze({
@@ -79,6 +85,22 @@ export function createInMemorySecurityRepositories(initialState = {}) {
 
         return cloneOrNull(workflow);
       }
+    }),
+
+    credentials: Object.freeze({
+      async findById(id) {
+        return cloneOrNull(credentialsById.get(id));
+      },
+
+      async findByProjectId(projectId) {
+        return cloneArray(credentialsByProjectId.get(projectId) ?? []);
+      },
+
+      async save(credential) {
+        saveCredential(credential);
+
+        return cloneOrNull(credential);
+      }
     })
   });
 
@@ -128,6 +150,29 @@ export function createInMemorySecurityRepositories(initialState = {}) {
     workflowsByProjectId.set(workflow.project_id, [
       ...withoutDuplicate,
       clone(workflow)
+    ]);
+  }
+
+  function saveCredential(credential) {
+    const existingCredential = credentialsById.get(credential.id);
+
+    if (existingCredential && existingCredential.project_id !== credential.project_id) {
+      const previousProjectCredentials =
+        credentialsByProjectId.get(existingCredential.project_id) ?? [];
+      credentialsByProjectId.set(
+        existingCredential.project_id,
+        previousProjectCredentials.filter((entry) => entry.id !== credential.id)
+      );
+    }
+
+    credentialsById.set(credential.id, clone(credential));
+
+    const projectCredentials = credentialsByProjectId.get(credential.project_id) ?? [];
+    const withoutDuplicate = projectCredentials.filter((entry) => entry.id !== credential.id);
+
+    credentialsByProjectId.set(credential.project_id, [
+      ...withoutDuplicate,
+      clone(credential)
     ]);
   }
 }
