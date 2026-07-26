@@ -14,11 +14,11 @@ In simple terms: n8n-style automation plus Botpress-style AI agents, with produc
 
 | Area | Feature | Priority | Status |
 | --- | --- | --- | --- |
-| Security | Real auth, JWT/session login, user ownership checks, RBAC, project/workspace isolation | P0 | In progress |
+| Security | Real auth, JWT/session login, user ownership checks, RBAC, project/workspace isolation | P0 | Completed |
 | Workflow Engine | DAG validation, branching, joins, retries, timeouts, error workflows, partial execution | P0 | Completed |
-| Safe Execution | Replace raw `python_script` execution with a sandboxed code runner or disabled production mode | P0 | In progress |
-| Credentials | Encrypted vault, credential ownership, credential sharing, external secret provider support | P0 | In progress |
-| Builder UX | Schema-driven node forms instead of raw JSON textareas | P0 | In progress |
+| Safe Execution | Replace raw `python_script` execution with a sandboxed code runner or disabled production mode | P0 | Completed |
+| Credentials | Encrypted vault, credential ownership, credential sharing, external secret provider support | P0 | Completed |
+| Builder UX | Schema-driven node forms instead of raw JSON textareas | P0 | Completed |
 | Executions | Execution history, node-level logs, input/output snapshots, rerun from failed node | P1 | In progress |
 | RAG | Knowledge base manager, document ingestion, chunking, embedding, vector search, reranking | P1 | Planned |
 | AI Agents | Agent node with tools, memory, model selection, prompt/instruction editor, tool-call visibility | P1 | Planned |
@@ -35,10 +35,10 @@ In simple terms: n8n-style automation plus Botpress-style AI agents, with produc
 
 Fix the current blockers first:
 
-- Add real authentication. Foundation implemented with password hashing, signed sessions, RBAC roles, and project-scoped workflow access.
+- Add real authentication. Foundation implemented with password hashing, signed sessions, RBAC roles, project-scoped workflow access, and auth/session HTTP handlers.
 - Scope credentials and workflows by user/project. Foundation implemented with project-scoped workflows and credentials.
-- Disable or sandbox `python_script`. Default workflow creation now rejects `python_script` until a sandboxed runner is configured.
-- Fix LanceDB overwrite behavior.
+- Disable or sandbox `python_script`. Default workflow creation now rejects `python_script` until a sandboxed runner is configured, and sandboxed runner execution is isolated behind an explicit service boundary.
+- Fix LanceDB overwrite behavior. Audit completed: no LanceDB/vector-store code exists in this repo yet, so the blocker is not applicable until RAG storage is introduced.
 - Add execution redaction so secrets do not leak in logs/results. Foundation implemented with reusable redaction rules.
 
 ### Phase 2: Workflow Builder Upgrade
@@ -46,7 +46,7 @@ Fix the current blockers first:
 - Replace raw JSON config with typed forms. Foundation implemented with schema-driven node definitions and typed parameter metadata.
 - Add node schemas exposed from the backend through `GET /nodes`. Framework-neutral node catalog service and `/nodes` handler are implemented.
 - Add validation before workflow execution. DAG validation and node parameter schema validation now block invalid workflows before persistence.
-- Add workflow templates for common use cases.
+- Add workflow templates for common use cases. Built-in templates, builder form metadata, and framework-neutral builder handlers are implemented.
 
 ### Phase 3: Execution Platform
 
@@ -137,12 +137,17 @@ These implementation foundations are completed so far:
 | Enforce architecture dependency boundaries | Completed |
 | Human-friendly architecture failure output | Completed |
 | Framework-neutral auth/session/RBAC/project-workflow isolation core | Completed |
+| Auth/session HTTP handlers | Completed |
 | Project-scoped encrypted credential vault and redaction core | Completed |
+| External secret provider resolution boundary | Completed |
 | Disabled `python_script` workflow nodes until sandboxed runner exists | Completed |
+| Sandboxed code runner service boundary | Completed |
+| LanceDB overwrite audit | Completed |
 | Workflow DAG validation before persistence | Completed |
 | Workflow node retry and timeout policy validation before persistence | Completed |
 | Workflow error branches, execution records, and partial rerun planning | Completed |
 | Schema-driven node catalog and workflow node parameter validation | Completed |
+| Workflow templates and builder form contract | Completed |
 
 ## Implementation Rule
 

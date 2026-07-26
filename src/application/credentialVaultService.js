@@ -12,6 +12,7 @@ export function createCredentialVaultService({
   membershipRepository,
   credentialRepository,
   secretCipher,
+  externalSecretProvider = null,
   idGenerator,
   clock = () => new Date()
 } = {}) {
@@ -23,6 +24,7 @@ export function createCredentialVaultService({
     "save"
   ]);
   assertSecretCipher(secretCipher);
+  assertExternalSecretProvider(externalSecretProvider);
 
   return Object.freeze({
     async createCredential({
@@ -117,10 +119,14 @@ export function createCredentialVaultService({
       });
 
       if (credential.external_ref) {
+        const secret = externalSecretProvider
+          ? await resolveExternalSecret(externalSecretProvider, credential)
+          : null;
+
         return Object.freeze({
           credential: toSafeCredential(credential),
           external_ref: credential.external_ref,
-          secret: null
+          secret
         });
       }
 
@@ -131,6 +137,16 @@ export function createCredentialVaultService({
       });
     }
   });
+}
+
+async function resolveExternalSecret(externalSecretProvider, credential) {
+  const secret = await externalSecretProvider.getSecret(credential.external_ref);
+
+  if (secret === null || secret === undefined) {
+    throw new TypeError("External secret was not found.");
+  }
+
+  return secret;
 }
 
 async function getProjectCredential({
@@ -229,6 +245,18 @@ function assertSecretCipher(secretCipher) {
     typeof secretCipher.decrypt !== "function"
   ) {
     throw new TypeError("createCredentialVaultService requires a secretCipher.");
+  }
+}
+
+function assertExternalSecretProvider(externalSecretProvider) {
+  if (
+    externalSecretProvider !== null &&
+    (
+      typeof externalSecretProvider !== "object" ||
+      typeof externalSecretProvider.getSecret !== "function"
+    )
+  ) {
+    throw new TypeError("createCredentialVaultService requires externalSecretProvider.getSecret().");
   }
 }
 

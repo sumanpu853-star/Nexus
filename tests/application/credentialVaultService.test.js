@@ -3,6 +3,7 @@ import test from "node:test";
 import { createCredentialVaultService } from "../../src/application/credentialVaultService.js";
 import { createProjectWorkflowSecurityService } from "../../src/application/projectWorkflowSecurityService.js";
 import { PROJECT_ROLES } from "../../src/domain/securityPolicy.js";
+import { createInMemoryExternalSecretProvider } from "../../src/infrastructure/inMemoryExternalSecretProvider.js";
 import { createInMemorySecurityRepositories } from "../../src/infrastructure/inMemorySecurityRepositories.js";
 
 const timestamp = "2026-07-26T00:00:00.000Z";
@@ -163,7 +164,39 @@ test("createCredential can record external secret references without local ciphe
   });
 });
 
-async function setupVault() {
+test("getCredentialSecret can resolve external secrets through a provider boundary", async () => {
+  const { vault } = await setupVault({
+    externalSecretProvider: createInMemoryExternalSecretProvider([
+      {
+        provider: "aws-secrets-manager",
+        ref: "prod/nexus/github",
+        secret: { token: "ghp_external_secret" }
+      }
+    ])
+  });
+
+  await vault.createCredential({
+    actor: { id: "owner_1" },
+    project_id: "project_1",
+    name: "Production GitHub Token",
+    type: "external",
+    external_ref: {
+      provider: "aws-secrets-manager",
+      ref: "prod/nexus/github"
+    }
+  });
+  const resolved = await vault.getCredentialSecret({
+    actor: { id: "owner_1" },
+    project_id: "project_1",
+    credential_id: "credential_1"
+  });
+
+  assert.deepEqual(resolved.secret, { token: "ghp_external_secret" });
+});
+
+async function setupVault({
+  externalSecretProvider = null
+} = {}) {
   const repositories = createInMemorySecurityRepositories();
   const idGenerator = sequenceIds();
   const projectService = createProjectWorkflowSecurityService({
@@ -178,6 +211,7 @@ async function setupVault() {
     membershipRepository: repositories.memberships,
     credentialRepository: repositories.credentials,
     secretCipher: fakeSecretCipher(),
+    externalSecretProvider,
     idGenerator,
     clock: () => new Date(timestamp)
   });

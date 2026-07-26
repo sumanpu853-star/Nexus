@@ -8,11 +8,12 @@ Nexus is an architecture-first codebase baseline with a small Node.js CLI for re
 
 - Node.js is the first runtime.
 - The architecture review CLI is the first production workflow.
-- P0 security implementation has started with framework-neutral auth, signed sessions, RBAC, and project-scoped workflow access.
-- P0 credential safety has started with encrypted credential storage, explicit sharing, and reusable secret redaction.
-- P0 safe execution has started by disabling `python_script` workflow nodes until a sandboxed runner exists.
+- P0 security foundation covers framework-neutral auth, signed sessions, RBAC, project-scoped access, and auth/session HTTP handlers.
+- P0 credential safety covers encrypted storage, explicit sharing, reusable redaction, and external secret provider resolution.
+- P0 safe execution covers disabled unsafe nodes plus an explicit sandboxed runner boundary for code execution.
 - P0 workflow engine foundation covers DAG validation, branching/joins, retry/timeout defaults, error branches, execution records, and partial rerun planning.
-- P0 builder UX foundation has started with schema-driven node definitions, workflow node parameter validation, and a `/nodes` catalog handler.
+- P0 builder UX foundation covers schema-driven node definitions, workflow node parameter validation, templates, node forms, and catalog handlers.
+- The LanceDB overwrite blocker was audited and is not applicable until vector-store code is introduced.
 - CI runs tests and the architecture review on pushes and pull requests.
 
 ## Repository Map
@@ -22,6 +23,7 @@ Nexus is an architecture-first codebase baseline with a small Node.js CLI for re
 - `docs/ARCHITECTURE_REVIEW.md` provides a repeatable architecture review workflow.
 - `docs/FEATURES.md` is the source of truth for feature priority.
 - `docs/REFACTORING_PLAN.md` tracks the step-by-step refactoring workflow.
+- `docs/audits/lancedb-overwrite-audit.md` records the LanceDB overwrite audit.
 - `docs/decisions/0001-architecture-baseline.md` records the first architecture decision.
 - `docs/decisions/0002-node-cli-first-workflow.md` records the first runtime and workflow decision.
 - `docs/decisions/0003-ci-validation-gate.md` records the CI validation decision.
@@ -37,6 +39,7 @@ Nexus is an architecture-first codebase baseline with a small Node.js CLI for re
 - `docs/decisions/0013-workflow-node-retry-timeout-policy.md` records the node execution policy decision.
 - `docs/decisions/0014-workflow-execution-records-and-error-branches.md` records the execution planning decision.
 - `docs/decisions/0015-schema-driven-node-catalog.md` records the node catalog decision.
+- `docs/decisions/0016-p0-foundation-completion.md` records the P0 completion boundary.
 - `nexus.config.json` defines the architecture checks used by the CLI and CI.
 - `src/` reserves the future production-code boundaries.
 - `tests/` reserves the future verification boundaries.
@@ -90,4 +93,4 @@ npm run print:config-schema
 
 ## Next Step
 
-Continue Builder UX from `docs/FEATURES.md`: workflow templates and a real form-rendering surface over the node catalog.
+Move to P1 from `docs/FEATURES.md`: deepen execution history, RAG, AI agents, integrations, deployment, and observability.

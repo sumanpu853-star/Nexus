@@ -38,6 +38,28 @@ test("node catalog service returns individual node definitions", async () => {
   );
 });
 
+test("node catalog service exposes form-rendering metadata", async () => {
+  const service = createNodeCatalogService();
+  const forms = await service.listNodeFormDefinitions();
+  const httpForm = forms.find((form) => form.node_type === "http_request");
+
+  assert.equal(Boolean(httpForm), true);
+  assert.deepEqual(
+    httpForm.fields.map((field) => [field.name, field.control]),
+    [
+      ["method", "select"],
+      ["url", "text"],
+      ["headers", "key_value"],
+      ["query", "key_value"],
+      ["body", "json"]
+    ]
+  );
+  assert.equal(
+    forms.some((form) => form.node_type === "python_script"),
+    false
+  );
+});
+
 test("node catalog service rejects duplicate custom node definitions", () => {
   assert.throws(
     () =>

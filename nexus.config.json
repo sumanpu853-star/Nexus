@@ -42,6 +42,14 @@
         "guidance": "Keep step-by-step refactoring guidance visible in docs/REFACTORING_PLAN.md."
       },
       {
+        "id": "lancedb-overwrite-audit",
+        "title": "LanceDB overwrite audit exists",
+        "target": "docs/audits/lancedb-overwrite-audit.md",
+        "kind": "fileExists",
+        "severity": "required",
+        "guidance": "Keep the P0 LanceDB overwrite audit visible until vector-store code is introduced."
+      },
+      {
         "id": "decisions-directory",
         "title": "Decision records directory exists",
         "target": "docs/decisions",
@@ -143,6 +151,14 @@
         "guidance": "Keep schema-driven node definitions and parameter validation in the domain layer."
       },
       {
+        "id": "workflow-template-policy-domain",
+        "title": "Workflow template policy domain exists",
+        "target": "src/domain/workflowTemplatePolicy.js",
+        "kind": "fileExists",
+        "severity": "required",
+        "guidance": "Keep workflow template validation in the domain layer."
+      },
+      {
         "id": "workflow-error-branch-policy-domain",
         "title": "Workflow error branch policy domain exists",
         "target": "src/domain/workflowErrorBranchPolicy.js",
@@ -199,12 +215,28 @@
         "guidance": "Keep execution queuing, node-run updates, and partial reruns in application orchestration."
       },
       {
+        "id": "sandboxed-runner-service",
+        "title": "Sandboxed runner service exists",
+        "target": "src/application/sandboxedRunnerService.js",
+        "kind": "fileExists",
+        "severity": "required",
+        "guidance": "Keep code execution behind an explicit sandboxed runner boundary."
+      },
+      {
         "id": "node-catalog-service",
         "title": "Node catalog service exists",
         "target": "src/application/nodeCatalogService.js",
         "kind": "fileExists",
         "severity": "required",
         "guidance": "Expose node definitions through application orchestration before adding UI or HTTP adapters."
+      },
+      {
+        "id": "workflow-template-service",
+        "title": "Workflow template service exists",
+        "target": "src/application/workflowTemplateService.js",
+        "kind": "fileExists",
+        "severity": "required",
+        "guidance": "Keep workflow template draft creation in application orchestration."
       },
       {
         "id": "credential-vault-service",
@@ -229,6 +261,22 @@
         "kind": "fileExists",
         "severity": "required",
         "guidance": "Keep the GET /nodes delivery adapter separate from node catalog domain rules."
+      },
+      {
+        "id": "authentication-http-handler",
+        "title": "Authentication HTTP handler exists",
+        "target": "src/interfaces/authenticationHttpHandler.js",
+        "kind": "fileExists",
+        "severity": "required",
+        "guidance": "Keep auth/session delivery wiring in the interface layer."
+      },
+      {
+        "id": "builder-http-handler",
+        "title": "Builder HTTP handler exists",
+        "target": "src/interfaces/builderHttpHandler.js",
+        "kind": "fileExists",
+        "severity": "required",
+        "guidance": "Keep builder form and workflow template routes in the interface layer."
       },
       {
         "id": "infrastructure-layer",
@@ -261,6 +309,14 @@
         "kind": "fileExists",
         "severity": "required",
         "guidance": "Issue signed session tokens through an infrastructure adapter."
+      },
+      {
+        "id": "external-secret-provider",
+        "title": "External secret provider adapter exists",
+        "target": "src/infrastructure/inMemoryExternalSecretProvider.js",
+        "kind": "fileExists",
+        "severity": "required",
+        "guidance": "Resolve external credential references through provider adapters."
       },
       {
         "id": "security-repositories",
