@@ -111,6 +111,14 @@
         "guidance": "Keep reusable redaction rules independent from infrastructure."
       },
       {
+        "id": "execution-safety-policy-domain",
+        "title": "Execution safety policy domain exists",
+        "target": "src/domain/executionSafetyPolicy.js",
+        "kind": "fileExists",
+        "severity": "required",
+        "guidance": "Keep unsafe node gating in the domain layer before adding execution runners."
+      },
+      {
         "id": "application-layer",
         "title": "Application layer directory exists",
         "target": "src/application",

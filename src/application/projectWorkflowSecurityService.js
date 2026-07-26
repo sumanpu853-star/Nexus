@@ -7,12 +7,14 @@ import {
   createProjectMembership,
   createWorkflowRecord
 } from "../domain/securityPolicy.js";
+import { assertWorkflowNodesSafe } from "../domain/executionSafetyPolicy.js";
 
 export function createProjectWorkflowSecurityService({
   projectRepository,
   membershipRepository,
   workflowRepository,
   idGenerator,
+  runnerCapabilities = {},
   clock = () => new Date()
 } = {}) {
   assertRepository(projectRepository, "projectRepository", ["findById", "save"]);
@@ -83,6 +85,10 @@ export function createProjectWorkflowSecurityService({
         project_id: project.id,
         memberships,
         permission: PROJECT_PERMISSIONS.CREATE_WORKFLOW
+      });
+      assertWorkflowNodesSafe({
+        nodes,
+        runnerCapabilities
       });
 
       const timestamp = nowIso(clock);

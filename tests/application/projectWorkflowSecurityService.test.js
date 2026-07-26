@@ -71,6 +71,66 @@ test("createWorkflow requires project membership with write permission", async (
   );
 });
 
+test("createWorkflow disables python_script until a sandboxed runner exists", async () => {
+  const repositories = createInMemorySecurityRepositories();
+  const service = createProjectWorkflowSecurityService({
+    projectRepository: repositories.projects,
+    membershipRepository: repositories.memberships,
+    workflowRepository: repositories.workflows,
+    idGenerator: sequenceIds(),
+    clock: () => new Date(timestamp)
+  });
+  const { project } = await service.createProjectForUser({
+    actor: { id: "owner_1" },
+    name: "AI Workflows"
+  });
+
+  await assert.rejects(
+    () =>
+      service.createWorkflow({
+        actor: { id: "owner_1" },
+        project_id: project.id,
+        name: "Unsafe Python Workflow",
+        nodes: [{ id: "script_1", type: "python_script" }]
+      }),
+    (error) => {
+      assert.equal(error.name, "UnsafeExecutionError");
+      assert.equal(error.violations[0].node_type, "python_script");
+      return true;
+    }
+  );
+  assert.deepEqual(await repositories.workflows.findByProjectId(project.id), []);
+});
+
+test("createWorkflow allows python_script when a sandboxed runner is configured", async () => {
+  const repositories = createInMemorySecurityRepositories();
+  const service = createProjectWorkflowSecurityService({
+    projectRepository: repositories.projects,
+    membershipRepository: repositories.memberships,
+    workflowRepository: repositories.workflows,
+    idGenerator: sequenceIds(),
+    runnerCapabilities: {
+      python_script: {
+        sandboxed: true
+      }
+    },
+    clock: () => new Date(timestamp)
+  });
+  const { project } = await service.createProjectForUser({
+    actor: { id: "owner_1" },
+    name: "AI Workflows"
+  });
+
+  const workflow = await service.createWorkflow({
+    actor: { id: "owner_1" },
+    project_id: project.id,
+    name: "Sandboxed Python Workflow",
+    nodes: [{ id: "script_1", type: "python_script" }]
+  });
+
+  assert.equal(workflow.name, "Sandboxed Python Workflow");
+});
+
 test("listProjectWorkflows allows viewers and blocks outsiders", async () => {
   const repositories = createInMemorySecurityRepositories();
   const service = createProjectWorkflowSecurityService({
