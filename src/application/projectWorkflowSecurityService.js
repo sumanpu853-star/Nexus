@@ -8,6 +8,7 @@ import {
   createWorkflowRecord
 } from "../domain/securityPolicy.js";
 import { assertWorkflowNodesSafe } from "../domain/executionSafetyPolicy.js";
+import { assertWorkflowGraphValid } from "../domain/workflowGraphPolicy.js";
 
 export function createProjectWorkflowSecurityService({
   projectRepository,
@@ -85,6 +86,10 @@ export function createProjectWorkflowSecurityService({
         project_id: project.id,
         memberships,
         permission: PROJECT_PERMISSIONS.CREATE_WORKFLOW
+      });
+      assertWorkflowGraphValid({
+        nodes,
+        edges
       });
       assertWorkflowNodesSafe({
         nodes,

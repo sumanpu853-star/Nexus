@@ -102,6 +102,76 @@ test("createWorkflow disables python_script until a sandboxed runner exists", as
   assert.deepEqual(await repositories.workflows.findByProjectId(project.id), []);
 });
 
+test("createWorkflow rejects invalid workflow graphs before persistence", async () => {
+  const repositories = createInMemorySecurityRepositories();
+  const service = createProjectWorkflowSecurityService({
+    projectRepository: repositories.projects,
+    membershipRepository: repositories.memberships,
+    workflowRepository: repositories.workflows,
+    idGenerator: sequenceIds(),
+    clock: () => new Date(timestamp)
+  });
+  const { project } = await service.createProjectForUser({
+    actor: { id: "owner_1" },
+    name: "AI Workflows"
+  });
+
+  await assert.rejects(
+    () =>
+      service.createWorkflow({
+        actor: { id: "owner_1" },
+        project_id: project.id,
+        name: "Broken Workflow",
+        nodes: [{ id: "trigger", type: "manual" }],
+        edges: [{ id: "bad_edge", source: "trigger", target: "missing" }]
+      }),
+    (error) => {
+      assert.equal(error.name, "WorkflowGraphValidationError");
+      assert.equal(error.violations[0].type, "missing_edge_target");
+      return true;
+    }
+  );
+  assert.deepEqual(await repositories.workflows.findByProjectId(project.id), []);
+});
+
+test("createWorkflow rejects cyclic workflow graphs", async () => {
+  const repositories = createInMemorySecurityRepositories();
+  const service = createProjectWorkflowSecurityService({
+    projectRepository: repositories.projects,
+    membershipRepository: repositories.memberships,
+    workflowRepository: repositories.workflows,
+    idGenerator: sequenceIds(),
+    clock: () => new Date(timestamp)
+  });
+  const { project } = await service.createProjectForUser({
+    actor: { id: "owner_1" },
+    name: "AI Workflows"
+  });
+
+  await assert.rejects(
+    () =>
+      service.createWorkflow({
+        actor: { id: "owner_1" },
+        project_id: project.id,
+        name: "Cyclic Workflow",
+        nodes: [
+          { id: "a", type: "manual" },
+          { id: "b", type: "http_request" }
+        ],
+        edges: [
+          { id: "a_to_b", source: "a", target: "b" },
+          { id: "b_to_a", source: "b", target: "a" }
+        ]
+      }),
+    (error) => {
+      assert.equal(error.name, "WorkflowGraphValidationError");
+      assert.equal(error.violations[0].type, "cycle");
+      return true;
+    }
+  );
+  assert.deepEqual(await repositories.workflows.findByProjectId(project.id), []);
+});
+
 test("createWorkflow allows python_script when a sandboxed runner is configured", async () => {
   const repositories = createInMemorySecurityRepositories();
   const service = createProjectWorkflowSecurityService({

@@ -2,7 +2,7 @@
 
 ## Status
 
-This repository now includes a small Node.js CLI that reviews the workspace against the architecture baseline. It also includes P0 product cores for authentication, signed sessions, RBAC, project-scoped workflow access, encrypted credentials, secret redaction, and safe execution gating.
+This repository now includes a small Node.js CLI that reviews the workspace against the architecture baseline. It also includes P0 product cores for authentication, signed sessions, RBAC, project-scoped workflow access, encrypted credentials, secret redaction, safe execution gating, and workflow DAG validation.
 
 ## Guiding Principles
 
@@ -25,7 +25,7 @@ Dependencies should point inward: infrastructure and interfaces can depend on ap
 
 The repository reserves these directories for that shape:
 
-- `src/domain`: rules, entities, value objects, domain services, security policy, credential policy, redaction rules, and execution safety policy.
+- `src/domain`: rules, entities, value objects, domain services, security policy, credential policy, redaction rules, execution safety policy, and workflow graph policy.
 - `src/application`: use cases, workflow orchestration, authentication, project-scoped access, and credential vault orchestration.
 - `src/interfaces`: delivery mechanisms such as HTTP, CLI, jobs, UI, or event handlers.
 - `src/infrastructure`: persistence, encryption, external APIs, filesystem, queues, and vendor SDKs.

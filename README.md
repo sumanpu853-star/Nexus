@@ -11,6 +11,7 @@ Nexus is an architecture-first codebase baseline with a small Node.js CLI for re
 - P0 security implementation has started with framework-neutral auth, signed sessions, RBAC, and project-scoped workflow access.
 - P0 credential safety has started with encrypted credential storage, explicit sharing, and reusable secret redaction.
 - P0 safe execution has started by disabling `python_script` workflow nodes until a sandboxed runner exists.
+- P0 workflow engine implementation has started with DAG validation before workflow persistence.
 - CI runs tests and the architecture review on pushes and pull requests.
 
 ## Repository Map
@@ -31,6 +32,7 @@ Nexus is an architecture-first codebase baseline with a small Node.js CLI for re
 - `docs/decisions/0009-security-core.md` records the first P0 security implementation decision.
 - `docs/decisions/0010-credential-vault-and-redaction.md` records the credential safety decision.
 - `docs/decisions/0011-disable-python-script-until-sandboxed.md` records the Python execution safety decision.
+- `docs/decisions/0012-workflow-dag-validation.md` records the workflow graph validation decision.
 - `nexus.config.json` defines the architecture checks used by the CLI and CI.
 - `src/` reserves the future production-code boundaries.
 - `tests/` reserves the future verification boundaries.
@@ -84,4 +86,4 @@ npm run print:config-schema
 
 ## Next Step
 
-Continue P0 production safety from `docs/FEATURES.md`: sandboxed execution runner design, workflow DAG validation, and durable persistence adapters.
+Continue P0 workflow engine work from `docs/FEATURES.md`: retry policies, timeout policies, error branches, and partial execution.

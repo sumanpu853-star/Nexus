@@ -15,7 +15,7 @@ In simple terms: n8n-style automation plus Botpress-style AI agents, with produc
 | Area | Feature | Priority | Status |
 | --- | --- | --- | --- |
 | Security | Real auth, JWT/session login, user ownership checks, RBAC, project/workspace isolation | P0 | In progress |
-| Workflow Engine | DAG validation, branching, joins, retries, timeouts, error workflows, partial execution | P0 | Planned |
+| Workflow Engine | DAG validation, branching, joins, retries, timeouts, error workflows, partial execution | P0 | In progress |
 | Safe Execution | Replace raw `python_script` execution with a sandboxed code runner or disabled production mode | P0 | In progress |
 | Credentials | Encrypted vault, credential ownership, credential sharing, external secret provider support | P0 | In progress |
 | Builder UX | Schema-driven node forms instead of raw JSON textareas | P0 | Planned |
@@ -45,7 +45,7 @@ Fix the current blockers first:
 
 - Replace raw JSON config with typed forms.
 - Add node schemas exposed from the backend through `GET /nodes`.
-- Add validation before workflow execution.
+- Add validation before workflow execution. DAG validation now blocks invalid graph shapes before workflow persistence.
 - Add workflow templates for common use cases.
 
 ### Phase 3: Execution Platform
@@ -139,6 +139,7 @@ These items were completed before this product roadmap replaced the placeholder 
 | Framework-neutral auth/session/RBAC/project-workflow isolation core | Completed |
 | Project-scoped encrypted credential vault and redaction core | Completed |
 | Disabled `python_script` workflow nodes until sandboxed runner exists | Completed |
+| Workflow DAG validation before persistence | Completed |
 
 ## Implementation Rule
 

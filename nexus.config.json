@@ -119,6 +119,14 @@
         "guidance": "Keep unsafe node gating in the domain layer before adding execution runners."
       },
       {
+        "id": "workflow-graph-policy-domain",
+        "title": "Workflow graph policy domain exists",
+        "target": "src/domain/workflowGraphPolicy.js",
+        "kind": "fileExists",
+        "severity": "required",
+        "guidance": "Keep DAG validation in the domain layer before adding execution runners."
+      },
+      {
         "id": "application-layer",
         "title": "Application layer directory exists",
         "target": "src/application",
