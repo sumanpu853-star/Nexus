@@ -102,6 +102,61 @@ test("in-memory security repositories update workflow project indexes", async ()
   assert.equal((await repositories.workflows.findByProjectId("project_2")).length, 1);
 });
 
+test("in-memory security repositories update execution workflow indexes", async () => {
+  const repositories = createInMemorySecurityRepositories();
+  await repositories.executions.save({
+    id: "execution_1",
+    workflow_id: "workflow_1",
+    workflow_version: 1,
+    project_id: "project_1",
+    status: "queued",
+    trigger_source: "manual",
+    mode: "manual",
+    started_by: "user_1",
+    partial_of_execution_id: null,
+    rerun_from_node_id: null,
+    input: {},
+    output: null,
+    error: null,
+    failed_node_id: null,
+    node_runs: [],
+    plan: {},
+    metadata: {},
+    started_at: "2026-07-26T00:00:00.000Z",
+    finished_at: null,
+    duration_ms: null,
+    created_at: "2026-07-26T00:00:00.000Z",
+    updated_at: "2026-07-26T00:00:00.000Z"
+  });
+  await repositories.executions.save({
+    id: "execution_1",
+    workflow_id: "workflow_2",
+    workflow_version: 1,
+    project_id: "project_1",
+    status: "queued",
+    trigger_source: "manual",
+    mode: "manual",
+    started_by: "user_1",
+    partial_of_execution_id: null,
+    rerun_from_node_id: null,
+    input: {},
+    output: null,
+    error: null,
+    failed_node_id: null,
+    node_runs: [],
+    plan: {},
+    metadata: {},
+    started_at: "2026-07-26T00:00:00.000Z",
+    finished_at: null,
+    duration_ms: null,
+    created_at: "2026-07-26T00:00:00.000Z",
+    updated_at: "2026-07-26T00:00:00.000Z"
+  });
+
+  assert.deepEqual(await repositories.executions.findByWorkflowId("workflow_1"), []);
+  assert.equal((await repositories.executions.findByWorkflowId("workflow_2")).length, 1);
+});
+
 test("in-memory security repositories update credential project indexes", async () => {
   const repositories = createInMemorySecurityRepositories();
   await repositories.credentials.save({

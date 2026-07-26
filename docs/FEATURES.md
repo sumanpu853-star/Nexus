@@ -15,11 +15,11 @@ In simple terms: n8n-style automation plus Botpress-style AI agents, with produc
 | Area | Feature | Priority | Status |
 | --- | --- | --- | --- |
 | Security | Real auth, JWT/session login, user ownership checks, RBAC, project/workspace isolation | P0 | In progress |
-| Workflow Engine | DAG validation, branching, joins, retries, timeouts, error workflows, partial execution | P0 | In progress |
+| Workflow Engine | DAG validation, branching, joins, retries, timeouts, error workflows, partial execution | P0 | Completed |
 | Safe Execution | Replace raw `python_script` execution with a sandboxed code runner or disabled production mode | P0 | In progress |
 | Credentials | Encrypted vault, credential ownership, credential sharing, external secret provider support | P0 | In progress |
 | Builder UX | Schema-driven node forms instead of raw JSON textareas | P0 | Planned |
-| Executions | Execution history, node-level logs, input/output snapshots, rerun from failed node | P1 | Planned |
+| Executions | Execution history, node-level logs, input/output snapshots, rerun from failed node | P1 | In progress |
 | RAG | Knowledge base manager, document ingestion, chunking, embedding, vector search, reranking | P1 | Planned |
 | AI Agents | Agent node with tools, memory, model selection, prompt/instruction editor, tool-call visibility | P1 | Planned |
 | Integrations | HTTP, Slack/Teams, Gmail/Outlook, Google Drive, GitHub, databases, webhooks, schedules | P1 | Planned |
@@ -50,9 +50,9 @@ Fix the current blockers first:
 
 ### Phase 3: Execution Platform
 
-- Store every execution with status, duration, `started_by`, trigger type, per-node input/output, and error.
-- Add retry policies, timeout policies, and error branches. Node-level retry and timeout policy validation and defaults are implemented before execution runner work.
-- Add manual, production, and webhook execution modes.
+- Store every execution with status, duration, `started_by`, trigger type, per-node input/output, and error. Foundation implemented with project-scoped execution records, node run snapshots, failure status, and redaction.
+- Add retry policies, timeout policies, and error branches. Node-level retry/timeout policy validation and error branch planning are implemented before execution runner work.
+- Add manual, production, and webhook execution modes. Mode and trigger validation are implemented at the execution record boundary.
 
 ### Phase 4: AI Agent Layer
 
@@ -141,6 +141,7 @@ These items were completed before this product roadmap replaced the placeholder 
 | Disabled `python_script` workflow nodes until sandboxed runner exists | Completed |
 | Workflow DAG validation before persistence | Completed |
 | Workflow node retry and timeout policy validation before persistence | Completed |
+| Workflow error branches, execution records, and partial rerun planning | Completed |
 
 ## Implementation Rule
 

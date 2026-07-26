@@ -135,6 +135,30 @@
         "guidance": "Keep retry and timeout policy validation in the domain layer before adding execution runners."
       },
       {
+        "id": "workflow-error-branch-policy-domain",
+        "title": "Workflow error branch policy domain exists",
+        "target": "src/domain/workflowErrorBranchPolicy.js",
+        "kind": "fileExists",
+        "severity": "required",
+        "guidance": "Keep error branch semantics in the domain layer before adding execution runners."
+      },
+      {
+        "id": "workflow-execution-plan-domain",
+        "title": "Workflow execution plan domain exists",
+        "target": "src/domain/workflowExecutionPlan.js",
+        "kind": "fileExists",
+        "severity": "required",
+        "guidance": "Keep success-path and partial execution planning independent from runner adapters."
+      },
+      {
+        "id": "workflow-execution-policy-domain",
+        "title": "Workflow execution policy domain exists",
+        "target": "src/domain/workflowExecutionPolicy.js",
+        "kind": "fileExists",
+        "severity": "required",
+        "guidance": "Keep execution record status and node run rules in the domain layer."
+      },
+      {
         "id": "application-layer",
         "title": "Application layer directory exists",
         "target": "src/application",
@@ -157,6 +181,14 @@
         "kind": "fileExists",
         "severity": "required",
         "guidance": "Keep workflow ownership and project isolation checks in application orchestration."
+      },
+      {
+        "id": "workflow-execution-service",
+        "title": "Workflow execution service exists",
+        "target": "src/application/workflowExecutionService.js",
+        "kind": "fileExists",
+        "severity": "required",
+        "guidance": "Keep execution queuing, node-run updates, and partial reruns in application orchestration."
       },
       {
         "id": "credential-vault-service",

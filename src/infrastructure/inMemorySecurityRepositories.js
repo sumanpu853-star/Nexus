@@ -5,6 +5,8 @@ export function createInMemorySecurityRepositories(initialState = {}) {
   const membershipsByProjectId = new Map();
   const workflowsById = new Map();
   const workflowsByProjectId = new Map();
+  const executionsById = new Map();
+  const executionsByWorkflowId = new Map();
   const credentialsById = new Map();
   const credentialsByProjectId = new Map();
 
@@ -22,6 +24,10 @@ export function createInMemorySecurityRepositories(initialState = {}) {
 
   for (const workflow of initialState.workflows ?? []) {
     saveWorkflow(workflow);
+  }
+
+  for (const execution of initialState.executions ?? []) {
+    saveExecution(execution);
   }
 
   for (const credential of initialState.credentials ?? []) {
@@ -84,6 +90,22 @@ export function createInMemorySecurityRepositories(initialState = {}) {
         saveWorkflow(workflow);
 
         return cloneOrNull(workflow);
+      }
+    }),
+
+    executions: Object.freeze({
+      async findById(id) {
+        return cloneOrNull(executionsById.get(id));
+      },
+
+      async findByWorkflowId(workflowId) {
+        return cloneArray(executionsByWorkflowId.get(workflowId) ?? []);
+      },
+
+      async save(execution) {
+        saveExecution(execution);
+
+        return cloneOrNull(execution);
       }
     }),
 
@@ -150,6 +172,29 @@ export function createInMemorySecurityRepositories(initialState = {}) {
     workflowsByProjectId.set(workflow.project_id, [
       ...withoutDuplicate,
       clone(workflow)
+    ]);
+  }
+
+  function saveExecution(execution) {
+    const existingExecution = executionsById.get(execution.id);
+
+    if (existingExecution && existingExecution.workflow_id !== execution.workflow_id) {
+      const previousWorkflowExecutions =
+        executionsByWorkflowId.get(existingExecution.workflow_id) ?? [];
+      executionsByWorkflowId.set(
+        existingExecution.workflow_id,
+        previousWorkflowExecutions.filter((entry) => entry.id !== execution.id)
+      );
+    }
+
+    executionsById.set(execution.id, clone(execution));
+
+    const workflowExecutions = executionsByWorkflowId.get(execution.workflow_id) ?? [];
+    const withoutDuplicate = workflowExecutions.filter((entry) => entry.id !== execution.id);
+
+    executionsByWorkflowId.set(execution.workflow_id, [
+      ...withoutDuplicate,
+      clone(execution)
     ]);
   }
 

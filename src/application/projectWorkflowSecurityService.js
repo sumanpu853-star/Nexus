@@ -8,6 +8,7 @@ import {
   createWorkflowRecord
 } from "../domain/securityPolicy.js";
 import { assertWorkflowNodesSafe } from "../domain/executionSafetyPolicy.js";
+import { applyWorkflowErrorBranchDefaults } from "../domain/workflowErrorBranchPolicy.js";
 import { applyWorkflowNodeExecutionPolicyDefaults } from "../domain/workflowNodeExecutionPolicy.js";
 import { assertWorkflowGraphValid } from "../domain/workflowGraphPolicy.js";
 
@@ -92,6 +93,9 @@ export function createProjectWorkflowSecurityService({
         nodes,
         edges
       });
+      const normalizedEdges = applyWorkflowErrorBranchDefaults({
+        edges
+      });
       const normalizedNodes = applyWorkflowNodeExecutionPolicyDefaults({
         nodes
       });
@@ -108,7 +112,7 @@ export function createProjectWorkflowSecurityService({
         owner_id: actorId,
         project_id: project.id,
         nodes: normalizedNodes,
-        edges,
+        edges: normalizedEdges,
         settings,
         created_at: timestamp,
         updated_at: timestamp

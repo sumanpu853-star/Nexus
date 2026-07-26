@@ -141,6 +141,72 @@ test("createWorkflow rejects invalid workflow graphs before persistence", async 
   assert.deepEqual(await repositories.workflows.findByProjectId(project.id), []);
 });
 
+test("createWorkflow persists error branch edge types and rejects duplicate error branches", async () => {
+  const repositories = createInMemorySecurityRepositories();
+  const service = createProjectWorkflowSecurityService({
+    projectRepository: repositories.projects,
+    membershipRepository: repositories.memberships,
+    workflowRepository: repositories.workflows,
+    idGenerator: sequenceIds(),
+    clock: () => new Date(timestamp)
+  });
+  const { project } = await service.createProjectForUser({
+    actor: { id: "owner_1" },
+    name: "AI Workflows"
+  });
+
+  const workflow = await service.createWorkflow({
+    actor: { id: "owner_1" },
+    project_id: project.id,
+    name: "HTTP With Error Branch",
+    nodes: [
+      { id: "manual", type: "manual" },
+      { id: "http", type: "http_request" },
+      { id: "notify", type: "slack" },
+      { id: "error_notify", type: "slack" }
+    ],
+    edges: [
+      { id: "manual_to_http", source: "manual", target: "http" },
+      { id: "http_to_notify", source: "http", target: "notify" },
+      { id: "http_to_error", source: "http", target: "error_notify", type: "error" }
+    ]
+  });
+
+  assert.deepEqual(
+    workflow.edges.map((edge) => [edge.id, edge.type]),
+    [
+      ["manual_to_http", "success"],
+      ["http_to_notify", "success"],
+      ["http_to_error", "error"]
+    ]
+  );
+
+  await assert.rejects(
+    () =>
+      service.createWorkflow({
+        actor: { id: "owner_1" },
+        project_id: project.id,
+        name: "Duplicate Error Branch",
+        nodes: [
+          { id: "manual", type: "manual" },
+          { id: "http", type: "http_request" },
+          { id: "error_a", type: "slack" },
+          { id: "error_b", type: "slack" }
+        ],
+        edges: [
+          { id: "manual_to_http", source: "manual", target: "http" },
+          { id: "error_a", source: "http", target: "error_a", type: "error" },
+          { id: "error_b", source: "http", target: "error_b", type: "error" }
+        ]
+      }),
+    (error) => {
+      assert.equal(error.name, "WorkflowErrorBranchPolicyError");
+      assert.equal(error.violations[0].type, "duplicate_error_branch");
+      return true;
+    }
+  );
+});
+
 test("createWorkflow rejects cyclic workflow graphs", async () => {
   const repositories = createInMemorySecurityRepositories();
   const service = createProjectWorkflowSecurityService({
