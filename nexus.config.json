@@ -231,6 +231,14 @@
         "guidance": "Keep deployment environments, variables, publish records, and webhook URL rules in the domain layer."
       },
       {
+        "id": "production-adapter-policy-domain",
+        "title": "Production adapter policy domain exists",
+        "target": "src/domain/productionAdapterPolicy.js",
+        "kind": "fileExists",
+        "severity": "required",
+        "guidance": "Keep production adapter catalog, config, health, and readiness rules in the domain layer."
+      },
+      {
         "id": "application-layer",
         "title": "Application layer directory exists",
         "target": "src/application",
@@ -327,6 +335,14 @@
         "guidance": "Keep deployment environment configuration and workflow publishing project-scoped."
       },
       {
+        "id": "production-adapter-service",
+        "title": "Production adapter service exists",
+        "target": "src/application/productionAdapterService.js",
+        "kind": "fileExists",
+        "severity": "required",
+        "guidance": "Keep production adapter configuration, health checks, and readiness orchestration behind a service boundary."
+      },
+      {
         "id": "interfaces-layer",
         "title": "Interfaces layer directory exists",
         "target": "src/interfaces",
@@ -409,6 +425,14 @@
         "kind": "fileExists",
         "severity": "required",
         "guidance": "Keep deployment delivery routes separate from application orchestration."
+      },
+      {
+        "id": "production-adapter-http-handler",
+        "title": "Production adapter HTTP handler exists",
+        "target": "src/interfaces/productionAdapterHttpHandler.js",
+        "kind": "fileExists",
+        "severity": "required",
+        "guidance": "Keep production adapter delivery routes separate from application orchestration."
       },
       {
         "id": "infrastructure-layer",
@@ -529,6 +553,22 @@
         "kind": "fileExists",
         "severity": "required",
         "guidance": "Keep deployment persistence details behind repository adapters."
+      },
+      {
+        "id": "production-adapter-repositories",
+        "title": "Production adapter repositories exist",
+        "target": "src/infrastructure/inMemoryProductionAdapterRepositories.js",
+        "kind": "fileExists",
+        "severity": "required",
+        "guidance": "Keep production adapter config and health persistence details behind repository adapters."
+      },
+      {
+        "id": "production-adapter-health-gateway",
+        "title": "Production adapter health gateway exists",
+        "target": "src/infrastructure/deterministicProductionAdapterHealthGateway.js",
+        "kind": "fileExists",
+        "severity": "required",
+        "guidance": "Keep production adapter health checks behind a gateway boundary so real providers can be swapped in."
       },
       {
         "id": "tests-directory",

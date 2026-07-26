@@ -197,6 +197,33 @@ Each deployment should include:
 - `published_at`
 - `disabled_at`
 
+### Production Adapter Object
+
+Each production adapter definition should include:
+
+- `type`
+- `category`
+- `label`
+- `description`
+- `required`
+- `capabilities`
+
+Each production adapter config should include:
+
+- `id`
+- `adapter_type`
+- `category`
+- `provider`
+- `status`
+- `endpoint`
+- `settings`
+- `secret_ref`
+- `capabilities`
+- `created_at`
+- `updated_at`
+
+Each health check should include adapter type, health status, check time, latency, message, and details. Readiness reports should summarize required adapter coverage, missing required adapters, failing adapters, warning adapters, unchecked adapters, and the current production readiness status.
+
 ## Differentiating Features
 
 Nexus should stand out through:
@@ -233,6 +260,7 @@ These implementation foundations are completed so far:
 | P1 AI agent model selection, prompt versions, memory scopes, tool permissions, deterministic model boundary, and visible tool-call records | Completed |
 | P1 integration catalog, project-scoped connections, credential binding, deterministic gateway, webhook endpoints, schedule triggers, and integration node schemas | Completed |
 | P1 deployment environments, safe environment variable snapshots, publish records, active deployment lookup, stable webhook URLs, and deployment HTTP routes | Completed |
+| P1 production adapter catalog, safe adapter configs, deterministic health gateway, readiness reports, and production adapter HTTP routes | Completed |
 | Schema-driven node catalog and workflow node parameter validation | Completed |
 | Workflow templates and builder form contract | Completed |
 

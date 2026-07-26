@@ -19,6 +19,7 @@ Nexus is an architecture-first codebase baseline with a small Node.js CLI for re
 - P1 AI agent foundation covers project-scoped agents, model selection, prompt versions, memory scopes, tool permissions, deterministic model adapters, and visible tool-call records.
 - P1 integrations foundation covers integration catalog, project-scoped connections, credential binding, deterministic gateway, webhooks, schedules, and node schemas.
 - P1 deployment foundation covers dev/stage/prod environments, safe environment variables, publish records, active deployment lookup, and stable webhook URLs.
+- P1 production adapter readiness covers a required adapter catalog, safe adapter configs, deterministic health checks, readiness reports, and production adapter routes.
 - The LanceDB overwrite blocker was audited and is not applicable until vector-store code is introduced.
 - CI runs tests and the architecture review on pushes and pull requests.
 
@@ -53,6 +54,7 @@ Nexus is an architecture-first codebase baseline with a small Node.js CLI for re
 - `docs/decisions/0021-p1-integration-foundation.md` records the integration catalog, connection, trigger, and gateway decision.
 - `docs/decisions/0022-p1-deployment-foundation.md` records the deployment environment, publish, and webhook URL decision.
 - `docs/decisions/0023-p1-observability-dashboard.md` records the dashboard-ready execution observability decision.
+- `docs/decisions/0024-p1-production-adapter-readiness.md` records the production adapter catalog, config, health, and readiness decision.
 - `nexus.config.json` defines the architecture checks used by the CLI and CI.
 - `src/` reserves the future production-code boundaries.
 - `tests/` reserves the future verification boundaries.
@@ -106,4 +108,4 @@ npm run print:config-schema
 
 ## Next Step
 
-Continue P1 from `docs/FEATURES.md`: finish remaining observability dashboards and production adapters.
+Continue P1 from `docs/FEATURES.md`: replace deterministic foundations with concrete production adapters for persistence, queueing, vector search, model providers, integrations, scheduling, sandboxing, and external secrets.
