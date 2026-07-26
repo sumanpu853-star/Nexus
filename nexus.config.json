@@ -87,12 +87,36 @@
         "guidance": "Keep src/domain independent from application, interface, and infrastructure layers."
       },
       {
+        "id": "security-policy-domain",
+        "title": "Security policy domain exists",
+        "target": "src/domain/securityPolicy.js",
+        "kind": "fileExists",
+        "severity": "required",
+        "guidance": "Keep auth, RBAC, and project isolation rules in the domain layer."
+      },
+      {
         "id": "application-layer",
         "title": "Application layer directory exists",
         "target": "src/application",
         "kind": "directoryExists",
         "severity": "required",
         "guidance": "Use the application layer for use cases and workflow orchestration."
+      },
+      {
+        "id": "authentication-service",
+        "title": "Authentication service exists",
+        "target": "src/application/authenticationService.js",
+        "kind": "fileExists",
+        "severity": "required",
+        "guidance": "Keep registration, login, and session authentication as application use cases."
+      },
+      {
+        "id": "project-workflow-security-service",
+        "title": "Project workflow security service exists",
+        "target": "src/application/projectWorkflowSecurityService.js",
+        "kind": "fileExists",
+        "severity": "required",
+        "guidance": "Keep workflow ownership and project isolation checks in application orchestration."
       },
       {
         "id": "interfaces-layer",
@@ -109,6 +133,30 @@
         "kind": "directoryExists",
         "severity": "required",
         "guidance": "Keep concrete integrations behind adapters."
+      },
+      {
+        "id": "password-hasher",
+        "title": "Password hasher exists",
+        "target": "src/infrastructure/nodeCryptoPasswordHasher.js",
+        "kind": "fileExists",
+        "severity": "required",
+        "guidance": "Hash passwords with a concrete crypto adapter instead of storing raw secrets."
+      },
+      {
+        "id": "session-token-issuer",
+        "title": "Session token issuer exists",
+        "target": "src/infrastructure/hmacSessionTokenIssuer.js",
+        "kind": "fileExists",
+        "severity": "required",
+        "guidance": "Issue signed session tokens through an infrastructure adapter."
+      },
+      {
+        "id": "security-repositories",
+        "title": "Security repositories exist",
+        "target": "src/infrastructure/inMemorySecurityRepositories.js",
+        "kind": "fileExists",
+        "severity": "required",
+        "guidance": "Keep persistence details behind repository adapters."
       },
       {
         "id": "tests-directory",
