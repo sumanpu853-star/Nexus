@@ -22,7 +22,7 @@ In simple terms: n8n-style automation plus Botpress-style AI agents, with produc
 | Executions | Execution history, node-level logs, input/output snapshots, rerun from failed node | P1 | In progress |
 | RAG | Knowledge base manager, document ingestion, chunking, embedding, vector search, reranking | P1 | In progress |
 | AI Agents | Agent node with tools, memory, model selection, prompt/instruction editor, tool-call visibility | P1 | In progress |
-| Integrations | HTTP, Slack/Teams, Gmail/Outlook, Google Drive, GitHub, databases, webhooks, schedules | P1 | Planned |
+| Integrations | HTTP, Slack/Teams, Gmail/Outlook, Google Drive, GitHub, databases, webhooks, schedules | P1 | In progress |
 | Deployment | Save/publish states, webhook URLs, environment variables, dev/stage/prod separation | P1 | Planned |
 | Observability | Logs, traces, metrics, cost tracking, token usage, latency, failure-rate dashboards | P1 | In progress |
 | Collaboration | Workflow versions, compare, restore, comments, templates, import/export | P2 | Planned |
@@ -152,6 +152,25 @@ Each agent should include:
 
 Each agent run should include input, output, model selection, memory policy, token usage, status, and visible tool-call records with allowed, blocked, failed, or completed outcomes.
 
+### Integration Object
+
+Each integration connection should include:
+
+- `id`
+- `project_id`
+- `owner_id`
+- `integration_type`
+- `name`
+- `credential_id`
+- `settings`
+- `status`
+- `created_at`
+- `updated_at`
+
+Each integration invocation should track the connection, action, input, output, status, error, start time, finish time, and duration.
+
+Webhook endpoints should map a project workflow to a stable path with optional connection and secret references. Schedule triggers should map a project workflow to a cron expression and timezone.
+
 ## Differentiating Features
 
 Nexus should stand out through:
@@ -185,6 +204,7 @@ These implementation foundations are completed so far:
 | P1 execution token/cost rollups, trace spans, metrics, and observability report route | Completed |
 | P1 RAG knowledge base manager, ingestion/chunking, embedding boundary, vector search, reranking hooks, and knowledge search node schema | Completed |
 | P1 AI agent model selection, prompt versions, memory scopes, tool permissions, deterministic model boundary, and visible tool-call records | Completed |
+| P1 integration catalog, project-scoped connections, credential binding, deterministic gateway, webhook endpoints, schedule triggers, and integration node schemas | Completed |
 | Schema-driven node catalog and workflow node parameter validation | Completed |
 | Workflow templates and builder form contract | Completed |
 

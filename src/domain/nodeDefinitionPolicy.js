@@ -136,6 +136,337 @@ const BUILT_IN_NODE_DEFINITIONS = deepFreeze([
     availability: { status: "available" }
   }),
   createNodeDefinition({
+    type: "teams_message",
+    label: "Teams Message",
+    category: NODE_CATEGORIES.ACTION,
+    icon: "messages-square",
+    input_handles: [{ id: "main", label: "Main" }],
+    output_handles: [{ id: "main", label: "Main" }],
+    parameter_schema: {
+      fields: [
+        {
+          name: "team",
+          label: "Team",
+          type: NODE_PARAMETER_TYPES.STRING,
+          control: NODE_PARAMETER_CONTROLS.TEXT,
+          required: false
+        },
+        {
+          name: "channel",
+          label: "Channel",
+          type: NODE_PARAMETER_TYPES.STRING,
+          control: NODE_PARAMETER_CONTROLS.TEXT,
+          required: true
+        },
+        {
+          name: "message",
+          label: "Message",
+          type: NODE_PARAMETER_TYPES.STRING,
+          control: NODE_PARAMETER_CONTROLS.TEXTAREA,
+          required: true
+        }
+      ]
+    },
+    credential_requirements: [
+      { name: "teams", type: "teams_oauth", required: false }
+    ],
+    execution: { supports_timeout: true, supports_retry: true },
+    redaction: { parameter_keys: [] },
+    availability: { status: "available" }
+  }),
+  createNodeDefinition({
+    type: "gmail",
+    label: "Gmail Email",
+    category: NODE_CATEGORIES.ACTION,
+    icon: "mail",
+    input_handles: [{ id: "main", label: "Main" }],
+    output_handles: [{ id: "main", label: "Main" }],
+    parameter_schema: {
+      fields: [
+        {
+          name: "to",
+          label: "To",
+          type: NODE_PARAMETER_TYPES.STRING,
+          control: NODE_PARAMETER_CONTROLS.TEXT,
+          required: true
+        },
+        {
+          name: "subject",
+          label: "Subject",
+          type: NODE_PARAMETER_TYPES.STRING,
+          control: NODE_PARAMETER_CONTROLS.TEXT,
+          required: true
+        },
+        {
+          name: "body",
+          label: "Body",
+          type: NODE_PARAMETER_TYPES.STRING,
+          control: NODE_PARAMETER_CONTROLS.TEXTAREA,
+          required: true
+        }
+      ]
+    },
+    credential_requirements: [
+      { name: "gmail", type: "gmail_oauth", required: false }
+    ],
+    execution: { supports_timeout: true, supports_retry: true },
+    redaction: { parameter_keys: [] },
+    availability: { status: "available" }
+  }),
+  createNodeDefinition({
+    type: "outlook_email",
+    label: "Outlook Email",
+    category: NODE_CATEGORIES.ACTION,
+    icon: "mail",
+    input_handles: [{ id: "main", label: "Main" }],
+    output_handles: [{ id: "main", label: "Main" }],
+    parameter_schema: {
+      fields: [
+        {
+          name: "to",
+          label: "To",
+          type: NODE_PARAMETER_TYPES.STRING,
+          control: NODE_PARAMETER_CONTROLS.TEXT,
+          required: true
+        },
+        {
+          name: "subject",
+          label: "Subject",
+          type: NODE_PARAMETER_TYPES.STRING,
+          control: NODE_PARAMETER_CONTROLS.TEXT,
+          required: true
+        },
+        {
+          name: "body",
+          label: "Body",
+          type: NODE_PARAMETER_TYPES.STRING,
+          control: NODE_PARAMETER_CONTROLS.TEXTAREA,
+          required: true
+        }
+      ]
+    },
+    credential_requirements: [
+      { name: "outlook", type: "outlook_oauth", required: false }
+    ],
+    execution: { supports_timeout: true, supports_retry: true },
+    redaction: { parameter_keys: [] },
+    availability: { status: "available" }
+  }),
+  createNodeDefinition({
+    type: "google_drive",
+    label: "Google Drive",
+    category: NODE_CATEGORIES.ACTION,
+    icon: "folder-up",
+    input_handles: [{ id: "main", label: "Main" }],
+    output_handles: [{ id: "main", label: "Main" }],
+    parameter_schema: {
+      fields: [
+        {
+          name: "action",
+          label: "Action",
+          type: NODE_PARAMETER_TYPES.ENUM,
+          control: NODE_PARAMETER_CONTROLS.SELECT,
+          required: true,
+          default: "list_files",
+          options: ["upload_file", "download_file", "list_files"]
+        },
+        {
+          name: "file_id",
+          label: "File ID",
+          type: NODE_PARAMETER_TYPES.STRING,
+          control: NODE_PARAMETER_CONTROLS.TEXT,
+          required: false
+        },
+        {
+          name: "file_name",
+          label: "File Name",
+          type: NODE_PARAMETER_TYPES.STRING,
+          control: NODE_PARAMETER_CONTROLS.TEXT,
+          required: false
+        },
+        {
+          name: "content",
+          label: "Content",
+          type: NODE_PARAMETER_TYPES.STRING,
+          control: NODE_PARAMETER_CONTROLS.TEXTAREA,
+          required: false
+        },
+        {
+          name: "folder_id",
+          label: "Folder ID",
+          type: NODE_PARAMETER_TYPES.STRING,
+          control: NODE_PARAMETER_CONTROLS.TEXT,
+          required: false
+        }
+      ]
+    },
+    credential_requirements: [
+      { name: "google_drive", type: "google_drive_oauth", required: false }
+    ],
+    execution: { supports_timeout: true, supports_retry: true },
+    redaction: { parameter_keys: [] },
+    availability: { status: "available" }
+  }),
+  createNodeDefinition({
+    type: "github",
+    label: "GitHub",
+    category: NODE_CATEGORIES.ACTION,
+    icon: "github",
+    input_handles: [{ id: "main", label: "Main" }],
+    output_handles: [{ id: "main", label: "Main" }],
+    parameter_schema: {
+      fields: [
+        {
+          name: "action",
+          label: "Action",
+          type: NODE_PARAMETER_TYPES.ENUM,
+          control: NODE_PARAMETER_CONTROLS.SELECT,
+          required: true,
+          default: "create_issue",
+          options: ["create_issue", "comment_on_issue", "dispatch_workflow"]
+        },
+        {
+          name: "repo",
+          label: "Repository",
+          type: NODE_PARAMETER_TYPES.STRING,
+          control: NODE_PARAMETER_CONTROLS.TEXT,
+          required: true
+        },
+        {
+          name: "title",
+          label: "Title",
+          type: NODE_PARAMETER_TYPES.STRING,
+          control: NODE_PARAMETER_CONTROLS.TEXT,
+          required: false
+        },
+        {
+          name: "body",
+          label: "Body",
+          type: NODE_PARAMETER_TYPES.STRING,
+          control: NODE_PARAMETER_CONTROLS.TEXTAREA,
+          required: false
+        },
+        {
+          name: "workflow",
+          label: "Workflow",
+          type: NODE_PARAMETER_TYPES.STRING,
+          control: NODE_PARAMETER_CONTROLS.TEXT,
+          required: false
+        }
+      ]
+    },
+    credential_requirements: [
+      { name: "github", type: "github_token", required: false }
+    ],
+    execution: { supports_timeout: true, supports_retry: true },
+    redaction: { parameter_keys: [] },
+    availability: { status: "available" }
+  }),
+  createNodeDefinition({
+    type: "database_query",
+    label: "Database Query",
+    category: NODE_CATEGORIES.ACTION,
+    icon: "database",
+    input_handles: [{ id: "main", label: "Main" }],
+    output_handles: [{ id: "main", label: "Main" }],
+    parameter_schema: {
+      fields: [
+        {
+          name: "query",
+          label: "Query",
+          type: NODE_PARAMETER_TYPES.STRING,
+          control: NODE_PARAMETER_CONTROLS.TEXTAREA,
+          required: true
+        },
+        {
+          name: "params",
+          label: "Params",
+          type: NODE_PARAMETER_TYPES.OBJECT,
+          control: NODE_PARAMETER_CONTROLS.JSON,
+          required: false,
+          default: {}
+        }
+      ]
+    },
+    credential_requirements: [
+      { name: "database", type: "database_connection", required: false }
+    ],
+    execution: { supports_timeout: true, supports_retry: true },
+    redaction: { parameter_keys: ["params"] },
+    availability: { status: "available" }
+  }),
+  createNodeDefinition({
+    type: "webhook",
+    label: "Webhook Trigger",
+    category: NODE_CATEGORIES.TRIGGER,
+    icon: "webhook",
+    input_handles: [],
+    output_handles: [{ id: "main", label: "Main" }],
+    parameter_schema: {
+      fields: [
+        {
+          name: "path",
+          label: "Path",
+          type: NODE_PARAMETER_TYPES.STRING,
+          control: NODE_PARAMETER_CONTROLS.TEXT,
+          required: true
+        },
+        {
+          name: "method",
+          label: "Method",
+          type: NODE_PARAMETER_TYPES.ENUM,
+          control: NODE_PARAMETER_CONTROLS.SELECT,
+          required: true,
+          default: "POST",
+          options: ["GET", "POST", "PUT", "PATCH", "DELETE"]
+        },
+        {
+          name: "secret_required",
+          label: "Secret Required",
+          type: NODE_PARAMETER_TYPES.BOOLEAN,
+          control: NODE_PARAMETER_CONTROLS.TOGGLE,
+          required: false,
+          default: true
+        }
+      ]
+    },
+    credential_requirements: [],
+    execution: { supports_timeout: false, supports_retry: false },
+    redaction: { parameter_keys: ["headers", "authorization"] },
+    availability: { status: "available" }
+  }),
+  createNodeDefinition({
+    type: "schedule",
+    label: "Schedule Trigger",
+    category: NODE_CATEGORIES.TRIGGER,
+    icon: "calendar-clock",
+    input_handles: [],
+    output_handles: [{ id: "main", label: "Main" }],
+    parameter_schema: {
+      fields: [
+        {
+          name: "cron",
+          label: "Cron",
+          type: NODE_PARAMETER_TYPES.STRING,
+          control: NODE_PARAMETER_CONTROLS.TEXT,
+          required: true
+        },
+        {
+          name: "timezone",
+          label: "Timezone",
+          type: NODE_PARAMETER_TYPES.STRING,
+          control: NODE_PARAMETER_CONTROLS.TEXT,
+          required: false,
+          default: "UTC"
+        }
+      ]
+    },
+    credential_requirements: [],
+    execution: { supports_timeout: false, supports_retry: false },
+    redaction: { parameter_keys: [] },
+    availability: { status: "available" }
+  }),
+  createNodeDefinition({
     type: "agent",
     label: "AI Agent",
     category: NODE_CATEGORIES.AI,

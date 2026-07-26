@@ -215,6 +215,14 @@
         "guidance": "Keep agent model, memory, prompt, tool permission, run, and tool-call rules in the domain layer."
       },
       {
+        "id": "integration-policy-domain",
+        "title": "Integration policy domain exists",
+        "target": "src/domain/integrationPolicy.js",
+        "kind": "fileExists",
+        "severity": "required",
+        "guidance": "Keep integration definitions, connections, invocations, webhook, and schedule rules in the domain layer."
+      },
+      {
         "id": "application-layer",
         "title": "Application layer directory exists",
         "target": "src/application",
@@ -295,6 +303,14 @@
         "guidance": "Keep agent creation, prompt versioning, memory, model, and tool execution orchestration project-scoped."
       },
       {
+        "id": "integration-service",
+        "title": "Integration service exists",
+        "target": "src/application/integrationService.js",
+        "kind": "fileExists",
+        "severity": "required",
+        "guidance": "Keep integration connection, invocation, webhook, and schedule orchestration project-scoped."
+      },
+      {
         "id": "interfaces-layer",
         "title": "Interfaces layer directory exists",
         "target": "src/interfaces",
@@ -349,6 +365,14 @@
         "kind": "fileExists",
         "severity": "required",
         "guidance": "Keep agent delivery routes separate from application orchestration."
+      },
+      {
+        "id": "integration-http-handler",
+        "title": "Integration HTTP handler exists",
+        "target": "src/interfaces/integrationHttpHandler.js",
+        "kind": "fileExists",
+        "severity": "required",
+        "guidance": "Keep integration delivery routes separate from application orchestration."
       },
       {
         "id": "infrastructure-layer",
@@ -445,6 +469,22 @@
         "kind": "fileExists",
         "severity": "required",
         "guidance": "Keep agent tool invocation behind a registry boundary with permission checks in the application layer."
+      },
+      {
+        "id": "integration-repositories",
+        "title": "Integration repositories exist",
+        "target": "src/infrastructure/inMemoryIntegrationRepositories.js",
+        "kind": "fileExists",
+        "severity": "required",
+        "guidance": "Keep integration persistence details behind repository adapters."
+      },
+      {
+        "id": "integration-gateway",
+        "title": "Integration gateway adapter exists",
+        "target": "src/infrastructure/deterministicIntegrationGateway.js",
+        "kind": "fileExists",
+        "severity": "required",
+        "guidance": "Keep integration calls behind a gateway boundary so production adapters can be swapped in."
       },
       {
         "id": "tests-directory",

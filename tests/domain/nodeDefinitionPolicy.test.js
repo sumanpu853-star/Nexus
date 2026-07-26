@@ -22,12 +22,22 @@ test("node definition policy exposes built-in schema-driven node definitions", (
     type: "knowledge_search",
     nodeDefinitions: definitions
   });
+  const github = findNodeDefinitionByType({
+    type: "github",
+    nodeDefinitions: definitions
+  });
+  const database = findNodeDefinitionByType({
+    type: "database_query",
+    nodeDefinitions: definitions
+  });
 
-  assert.equal(definitions.length >= 6, true);
+  assert.equal(definitions.length >= 14, true);
   assert.equal(http.label, "HTTP Request");
   assert.equal(http.category, NODE_CATEGORIES.ACTION);
   assert.equal(knowledgeSearch.category, NODE_CATEGORIES.AI);
   assert.equal(knowledgeSearch.availability.status, "available");
+  assert.equal(github.category, NODE_CATEGORIES.ACTION);
+  assert.equal(database.redaction.parameter_keys.includes("params"), true);
   assert.deepEqual(
     http.parameter_schema.fields.map((field) => [field.name, field.type, field.control]),
     [
@@ -39,6 +49,37 @@ test("node definition policy exposes built-in schema-driven node definitions", (
     ]
   );
   assert.equal(Object.isFrozen(http.parameter_schema.fields[0]), true);
+});
+
+test("node definition policy exposes integration trigger and action defaults", () => {
+  const normalized = applyWorkflowNodeDefinitionDefaults({
+    nodes: [
+      {
+        id: "drive",
+        type: "google_drive",
+        parameters: {}
+      },
+      {
+        id: "webhook",
+        type: "webhook",
+        parameters: {
+          path: "/hooks/intake"
+        }
+      },
+      {
+        id: "schedule",
+        type: "schedule",
+        parameters: {
+          cron: "*/5 * * * *"
+        }
+      }
+    ]
+  });
+
+  assert.equal(normalized[0].parameters.action, "list_files");
+  assert.equal(normalized[1].parameters.method, "POST");
+  assert.equal(normalized[1].parameters.secret_required, true);
+  assert.equal(normalized[2].parameters.timezone, "UTC");
 });
 
 test("node definition policy exposes knowledge search form defaults", () => {

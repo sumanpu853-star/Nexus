@@ -82,6 +82,22 @@ test("maps project roles to permissions", () => {
     roleHasPermission(PROJECT_ROLES.VIEWER, PROJECT_PERMISSIONS.RUN_AGENTS),
     false
   );
+  assert.equal(
+    roleHasPermission(PROJECT_ROLES.EDITOR, PROJECT_PERMISSIONS.MANAGE_INTEGRATIONS),
+    true
+  );
+  assert.equal(
+    roleHasPermission(PROJECT_ROLES.EDITOR, PROJECT_PERMISSIONS.RUN_INTEGRATIONS),
+    true
+  );
+  assert.equal(
+    roleHasPermission(PROJECT_ROLES.VIEWER, PROJECT_PERMISSIONS.READ_INTEGRATIONS),
+    true
+  );
+  assert.equal(
+    roleHasPermission(PROJECT_ROLES.VIEWER, PROJECT_PERMISSIONS.RUN_INTEGRATIONS),
+    false
+  );
 });
 
 test("assertProjectPermission requires membership and role permission", () => {
