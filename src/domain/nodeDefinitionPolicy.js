@@ -145,6 +145,22 @@ const BUILT_IN_NODE_DEFINITIONS = deepFreeze([
     parameter_schema: {
       fields: [
         {
+          name: "model",
+          label: "Model",
+          type: NODE_PARAMETER_TYPES.STRING,
+          control: NODE_PARAMETER_CONTROLS.TEXT,
+          required: false,
+          default: "nexus-agent-deterministic-v1"
+        },
+        {
+          name: "temperature",
+          label: "Temperature",
+          type: NODE_PARAMETER_TYPES.NUMBER,
+          control: NODE_PARAMETER_CONTROLS.NUMBER,
+          required: false,
+          default: 0.2
+        },
+        {
           name: "instructions",
           label: "Instructions",
           type: NODE_PARAMETER_TYPES.STRING,
@@ -160,11 +176,29 @@ const BUILT_IN_NODE_DEFINITIONS = deepFreeze([
           default: []
         },
         {
+          name: "memory_scope",
+          label: "Memory Scope",
+          type: NODE_PARAMETER_TYPES.ENUM,
+          control: NODE_PARAMETER_CONTROLS.SELECT,
+          required: false,
+          default: "session",
+          options: ["none", "session", "user", "semantic"]
+        },
+        {
           name: "memory_key",
           label: "Memory Key",
           type: NODE_PARAMETER_TYPES.STRING,
           control: NODE_PARAMETER_CONTROLS.TEXT,
-          required: false
+          required: false,
+          default: "default"
+        },
+        {
+          name: "tool_call_visibility",
+          label: "Tool Call Visibility",
+          type: NODE_PARAMETER_TYPES.BOOLEAN,
+          control: NODE_PARAMETER_CONTROLS.TOGGLE,
+          required: false,
+          default: true
         }
       ]
     },

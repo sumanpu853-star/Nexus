@@ -2,7 +2,7 @@
 
 ## Status
 
-This repository now includes a small Node.js CLI that reviews the workspace against the architecture baseline. It also includes completed P0 foundations for authentication, signed sessions, auth/session HTTP handlers, RBAC, project-scoped workflow access, encrypted credentials, external secret provider resolution, secret redaction, safe execution gating, sandboxed runner boundaries, workflow DAG validation, workflow node retry/timeout policy validation, error branch planning, execution records, partial reruns, schema-driven node definitions, builder forms, and workflow templates. P1 execution diagnostics now add summarized execution history, node-level logs, diagnostic timelines, token/cost rollups, trace spans, observability reports, and execution HTTP routes. P1 RAG foundations now add project-scoped knowledge bases, document ingestion, chunking, embedding boundaries, vector search, reranking hooks, and knowledge base HTTP routes.
+This repository now includes a small Node.js CLI that reviews the workspace against the architecture baseline. It also includes completed P0 foundations for authentication, signed sessions, auth/session HTTP handlers, RBAC, project-scoped workflow access, encrypted credentials, external secret provider resolution, secret redaction, safe execution gating, sandboxed runner boundaries, workflow DAG validation, workflow node retry/timeout policy validation, error branch planning, execution records, partial reruns, schema-driven node definitions, builder forms, and workflow templates. P1 execution diagnostics now add summarized execution history, node-level logs, diagnostic timelines, token/cost rollups, trace spans, observability reports, and execution HTTP routes. P1 RAG foundations now add project-scoped knowledge bases, document ingestion, chunking, embedding boundaries, vector search, reranking hooks, and knowledge base HTTP routes. P1 AI agent foundations now add project-scoped agents, model selection, prompt versions, memory scopes, tool permissions, visible tool-call records, and agent HTTP routes.
 
 ## Guiding Principles
 
@@ -25,10 +25,10 @@ Dependencies should point inward: infrastructure and interfaces can depend on ap
 
 The repository reserves these directories for that shape:
 
-- `src/domain`: rules, entities, value objects, domain services, security policy, credential policy, redaction rules, execution safety policy, workflow graph policy, workflow node execution policy, node definition policy, workflow template policy, error branch policy, execution planning, execution record policy, execution history policy, execution observability policy, and knowledge base policy.
-- `src/application`: use cases, workflow orchestration, authentication, project-scoped access, credential vault orchestration, sandboxed runner orchestration, node catalog orchestration, workflow template orchestration, workflow execution orchestration, and knowledge base orchestration.
-- `src/interfaces`: delivery mechanisms such as HTTP, CLI, jobs, UI, event handlers, auth handlers, builder handlers, execution handlers, knowledge base handlers, and framework-neutral route handlers.
-- `src/infrastructure`: persistence, encryption, external secret providers, external APIs, filesystems, queues, execution storage adapters, knowledge repositories, embedding providers, vector indexes, and vendor SDKs.
+- `src/domain`: rules, entities, value objects, domain services, security policy, credential policy, redaction rules, execution safety policy, workflow graph policy, workflow node execution policy, node definition policy, workflow template policy, error branch policy, execution planning, execution record policy, execution history policy, execution observability policy, knowledge base policy, and agent policy.
+- `src/application`: use cases, workflow orchestration, authentication, project-scoped access, credential vault orchestration, sandboxed runner orchestration, node catalog orchestration, workflow template orchestration, workflow execution orchestration, knowledge base orchestration, and agent orchestration.
+- `src/interfaces`: delivery mechanisms such as HTTP, CLI, jobs, UI, event handlers, auth handlers, builder handlers, execution handlers, knowledge base handlers, agent handlers, and framework-neutral route handlers.
+- `src/infrastructure`: persistence, encryption, external secret providers, external APIs, filesystems, queues, execution storage adapters, knowledge repositories, embedding providers, vector indexes, agent repositories, model providers, tool registries, and vendor SDKs.
 - `tests`: tests organized around behavior and architectural boundaries.
 
 See `docs/BOUNDARIES.md` for dependency rules.
@@ -46,4 +46,5 @@ See `docs/BOUNDARIES.md` for dependency rules.
 - Is Nexus a service, library, web app, automation, desktop app, or mixed system?
 - Which production HTTP server should bind the framework-neutral handlers?
 - Which production vector store should replace the in-memory RAG vector index?
+- Which production LLM provider should replace the deterministic agent model provider first?
 - Which production sandbox and external secret providers should ship first?

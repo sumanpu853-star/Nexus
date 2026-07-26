@@ -207,6 +207,14 @@
         "guidance": "Keep RAG knowledge base, chunking, search result, and vector write rules in the domain layer."
       },
       {
+        "id": "agent-policy-domain",
+        "title": "Agent policy domain exists",
+        "target": "src/domain/agentPolicy.js",
+        "kind": "fileExists",
+        "severity": "required",
+        "guidance": "Keep agent model, memory, prompt, tool permission, run, and tool-call rules in the domain layer."
+      },
+      {
         "id": "application-layer",
         "title": "Application layer directory exists",
         "target": "src/application",
@@ -279,6 +287,14 @@
         "guidance": "Keep RAG ingestion and search project-scoped and adapter-backed."
       },
       {
+        "id": "agent-service",
+        "title": "Agent service exists",
+        "target": "src/application/agentService.js",
+        "kind": "fileExists",
+        "severity": "required",
+        "guidance": "Keep agent creation, prompt versioning, memory, model, and tool execution orchestration project-scoped."
+      },
+      {
         "id": "interfaces-layer",
         "title": "Interfaces layer directory exists",
         "target": "src/interfaces",
@@ -325,6 +341,14 @@
         "kind": "fileExists",
         "severity": "required",
         "guidance": "Keep RAG knowledge base routes separate from application orchestration."
+      },
+      {
+        "id": "agent-http-handler",
+        "title": "Agent HTTP handler exists",
+        "target": "src/interfaces/agentHttpHandler.js",
+        "kind": "fileExists",
+        "severity": "required",
+        "guidance": "Keep agent delivery routes separate from application orchestration."
       },
       {
         "id": "infrastructure-layer",
@@ -397,6 +421,30 @@
         "kind": "fileExists",
         "severity": "required",
         "guidance": "Keep vector search behind an adapter with explicit append, upsert, and replace modes."
+      },
+      {
+        "id": "agent-repositories",
+        "title": "Agent repositories exist",
+        "target": "src/infrastructure/inMemoryAgentRepositories.js",
+        "kind": "fileExists",
+        "severity": "required",
+        "guidance": "Keep agent, prompt version, run, and memory persistence details behind repository adapters."
+      },
+      {
+        "id": "agent-model-provider",
+        "title": "Agent model provider adapter exists",
+        "target": "src/infrastructure/deterministicAgentModelProvider.js",
+        "kind": "fileExists",
+        "severity": "required",
+        "guidance": "Keep agent model generation behind a provider boundary so production LLMs can be swapped in."
+      },
+      {
+        "id": "agent-tool-registry",
+        "title": "Agent tool registry adapter exists",
+        "target": "src/infrastructure/inMemoryAgentToolRegistry.js",
+        "kind": "fileExists",
+        "severity": "required",
+        "guidance": "Keep agent tool invocation behind a registry boundary with permission checks in the application layer."
       },
       {
         "id": "tests-directory",

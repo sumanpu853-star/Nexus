@@ -64,6 +64,30 @@ test("node definition policy exposes knowledge search form defaults", () => {
   });
 });
 
+test("node definition policy exposes agent model, memory, and visibility defaults", () => {
+  const normalized = applyWorkflowNodeDefinitionDefaults({
+    nodes: [
+      {
+        id: "agent",
+        type: "agent",
+        parameters: {
+          instructions: "Answer support questions."
+        }
+      }
+    ]
+  });
+
+  assert.deepEqual(normalized[0].parameters, {
+    model: "nexus-agent-deterministic-v1",
+    temperature: 0.2,
+    instructions: "Answer support questions.",
+    tools: [],
+    memory_scope: "session",
+    memory_key: "default",
+    tool_call_visibility: true
+  });
+});
+
 test("node definition policy applies labels, parameters, and credential defaults", () => {
   const normalized = applyWorkflowNodeDefinitionDefaults({
     nodes: [
