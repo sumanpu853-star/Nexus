@@ -7,6 +7,7 @@ import {
   WORKFLOW_EXECUTION_STATUSES,
   WORKFLOW_NODE_LOG_LEVELS,
   WORKFLOW_NODE_RUN_STATUSES,
+  WORKFLOW_TRACE_SPAN_KINDS,
   WORKFLOW_TRIGGER_SOURCES
 } from "../../src/domain/workflowExecutionPolicy.js";
 import { createInMemorySecurityRepositories } from "../../src/infrastructure/inMemorySecurityRepositories.js";
@@ -120,6 +121,57 @@ test("recordNodeRunResult updates execution status and redacts node snapshots", 
   );
 });
 
+test("recordNodeRunResult rolls up token usage, cost, and trace spans", async () => {
+  const { workflow, executionService } = await createWorkflowFixture();
+  const execution = await executionService.queueWorkflowExecution({
+    actor: { id: "owner_1" },
+    project_id: workflow.project_id,
+    workflow_id: workflow.id
+  });
+
+  const updated = await executionService.recordNodeRunResult({
+    actor: { id: "owner_1" },
+    project_id: workflow.project_id,
+    execution_id: execution.id,
+    node_id: "http",
+    status: WORKFLOW_NODE_RUN_STATUSES.SUCCESS,
+    usage: {
+      input_tokens: 30,
+      output_tokens: 12
+    },
+    cost: {
+      amount: 0.0042
+    },
+    trace: {
+      name: "HTTP upstream call",
+      kind: WORKFLOW_TRACE_SPAN_KINDS.INTEGRATION,
+      attributes: {
+        url: "https://example.com/api",
+        authorization: "Bearer secret-token"
+      }
+    },
+    secretValues: ["secret-token"]
+  });
+  const httpRun = updated.node_runs.find((nodeRun) => nodeRun.node_id === "http");
+
+  assert.deepEqual(updated.usage, {
+    input_tokens: 30,
+    output_tokens: 12,
+    total_tokens: 42
+  });
+  assert.deepEqual(updated.cost, {
+    amount: 0.0042,
+    currency: "USD"
+  });
+  assert.equal(updated.trace_spans.length, 1);
+  assert.equal(updated.trace_spans[0].kind, WORKFLOW_TRACE_SPAN_KINDS.INTEGRATION);
+  assert.deepEqual(updated.trace_spans[0].attributes, {
+    url: "https://example.com/api",
+    authorization: "[REDACTED]"
+  });
+  assert.equal(httpRun.trace_span_id, updated.trace_spans[0].id);
+});
+
 test("queuePartialWorkflowExecution queues only the failed node and downstream success path", async () => {
   const { workflow, executionService } = await createWorkflowFixture();
   const execution = await executionService.queueWorkflowExecution({
@@ -227,6 +279,55 @@ test("listWorkflowExecutionHistory and getWorkflowExecutionTimeline expose execu
     timeline.events.map((event) => event.type),
     ["execution_queued", "node_started", "node_log", "node_finished", "execution_finished"]
   );
+});
+
+test("getWorkflowExecutionObservability exposes aggregate metrics to project viewers", async () => {
+  const { workflow, executionService } = await createWorkflowFixture();
+  const execution = await executionService.queueWorkflowExecution({
+    actor: { id: "owner_1" },
+    project_id: workflow.project_id,
+    workflow_id: workflow.id
+  });
+  await executionService.recordNodeRunResult({
+    actor: { id: "owner_1" },
+    project_id: workflow.project_id,
+    execution_id: execution.id,
+    node_id: "http",
+    status: WORKFLOW_NODE_RUN_STATUSES.FAILED,
+    error: "HTTP 500",
+    usage: {
+      input_tokens: 20,
+      output_tokens: 5
+    },
+    cost: {
+      amount: 0.002
+    },
+    trace: {
+      name: "HTTP upstream call",
+      kind: WORKFLOW_TRACE_SPAN_KINDS.INTEGRATION
+    }
+  });
+
+  const observability = await executionService.getWorkflowExecutionObservability({
+    actor: { id: "viewer_1" },
+    project_id: workflow.project_id,
+    workflow_id: workflow.id
+  });
+
+  assert.equal(observability.execution_count, 1);
+  assert.equal(observability.status_counts.failed, 1);
+  assert.equal(observability.failure_rate, 1);
+  assert.deepEqual(observability.token_usage, {
+    input_tokens: 20,
+    output_tokens: 5,
+    total_tokens: 25
+  });
+  assert.deepEqual(observability.cost, {
+    amount: 0.002,
+    currency: "USD"
+  });
+  assert.equal(observability.trace_summary.status_counts.error, 1);
+  assert.equal(observability.node_metrics[0].node_id, "http");
 });
 
 test("listWorkflowExecutions allows project viewers to inspect execution history", async () => {

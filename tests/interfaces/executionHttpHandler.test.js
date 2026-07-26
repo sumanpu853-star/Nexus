@@ -5,7 +5,8 @@ import { createWorkflowExecutionService } from "../../src/application/workflowEx
 import { PROJECT_ROLES } from "../../src/domain/securityPolicy.js";
 import {
   WORKFLOW_EXECUTION_STATUSES,
-  WORKFLOW_NODE_RUN_STATUSES
+  WORKFLOW_NODE_RUN_STATUSES,
+  WORKFLOW_TRACE_SPAN_KINDS
 } from "../../src/domain/workflowExecutionPolicy.js";
 import { createInMemorySecurityRepositories } from "../../src/infrastructure/inMemorySecurityRepositories.js";
 import { createExecutionHttpHandler } from "../../src/interfaces/executionHttpHandler.js";
@@ -115,6 +116,63 @@ test("execution http handler records node logs and queues failed-node reruns", a
   );
   assert.equal(rerun.status, 201);
   assert.deepEqual(rerun.body.execution.plan.node_ids, ["http", "notify"]);
+});
+
+test("execution http handler records result metrics and exposes observability", async () => {
+  const { workflow, executionService, handler } = await createExecutionHandlerFixture();
+  const execution = await executionService.queueWorkflowExecution({
+    actor: { id: "owner_1" },
+    project_id: workflow.project_id,
+    workflow_id: workflow.id
+  });
+
+  const result = await handler.handle({
+    actor: { id: "owner_1" },
+    method: "POST",
+    path: `/executions/${execution.id}/node-runs/http/result`,
+    body: {
+      project_id: workflow.project_id,
+      status: WORKFLOW_NODE_RUN_STATUSES.FAILED,
+      error: "HTTP 500",
+      usage: {
+        input_tokens: 25,
+        output_tokens: 5
+      },
+      cost: {
+        amount: 0.003
+      },
+      trace: {
+        name: "HTTP upstream call",
+        kind: WORKFLOW_TRACE_SPAN_KINDS.INTEGRATION,
+        attributes: {
+          authorization: "Bearer secret-token"
+        }
+      },
+      secretValues: ["secret-token"]
+    }
+  });
+  const observability = await handler.handle({
+    actor: { id: "viewer_1" },
+    method: "GET",
+    path: `/workflows/${workflow.id}/executions/observability`,
+    query: {
+      project_id: workflow.project_id
+    }
+  });
+
+  assert.equal(result.status, 200);
+  assert.deepEqual(result.body.execution.usage, {
+    input_tokens: 25,
+    output_tokens: 5,
+    total_tokens: 30
+  });
+  assert.equal(result.body.execution.trace_spans[0].attributes.authorization, "[REDACTED]");
+  assert.equal(observability.status, 200);
+  assert.equal(observability.body.observability.failure_rate, 1);
+  assert.deepEqual(observability.body.observability.cost, {
+    amount: 0.003,
+    currency: "USD"
+  });
 });
 
 async function createExecutionHandlerFixture() {

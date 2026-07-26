@@ -18,6 +18,24 @@ export function createExecutionHttpHandler({
       try {
         if (
           method === "GET" &&
+          segments.length === 4 &&
+          segments[0] === "workflows" &&
+          segments[2] === "executions" &&
+          segments[3] === "observability"
+        ) {
+          const query = normalizeQuery(request.query);
+
+          return jsonResponse(200, {
+            observability: await workflowExecutionService.getWorkflowExecutionObservability({
+              actor: request.actor,
+              project_id: query.project_id,
+              workflow_id: segments[1]
+            })
+          });
+        }
+
+        if (
+          method === "GET" &&
           segments.length === 3 &&
           segments[0] === "workflows" &&
           segments[2] === "executions"
@@ -67,6 +85,34 @@ export function createExecutionHttpHandler({
               actor: request.actor,
               project_id: query.project_id,
               execution_id: segments[1]
+            })
+          });
+        }
+
+        if (
+          method === "POST" &&
+          segments.length === 5 &&
+          segments[0] === "executions" &&
+          segments[2] === "node-runs" &&
+          segments[4] === "result"
+        ) {
+          const body = normalizeBody(request.body);
+
+          return jsonResponse(200, {
+            execution: await workflowExecutionService.recordNodeRunResult({
+              actor: request.actor,
+              project_id: body.project_id,
+              execution_id: segments[1],
+              node_id: segments[3],
+              status: body.status,
+              attempt: body.attempt,
+              input: body.input,
+              output: body.output,
+              error: body.error,
+              usage: body.usage,
+              cost: body.cost,
+              trace: body.trace,
+              secretValues: body.secretValues
             })
           });
         }
@@ -138,9 +184,11 @@ export function createExecutionHttpHandler({
 function assertExecutionService(workflowExecutionService) {
   for (const method of [
     "getWorkflowExecution",
+    "getWorkflowExecutionObservability",
     "getWorkflowExecutionTimeline",
     "listWorkflowExecutionHistory",
     "queuePartialWorkflowExecution",
+    "recordNodeRunResult",
     "recordNodeRunLog"
   ]) {
     if (!workflowExecutionService || typeof workflowExecutionService[method] !== "function") {

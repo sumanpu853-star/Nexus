@@ -1,5 +1,7 @@
 import {
-  WORKFLOW_NODE_RUN_STATUSES
+  WORKFLOW_NODE_RUN_STATUSES,
+  createWorkflowCostRecord,
+  createWorkflowTokenUsageRecord
 } from "./workflowExecutionPolicy.js";
 
 const DEFAULT_HISTORY_LIMIT = 50;
@@ -98,6 +100,9 @@ export function createWorkflowExecutionSummary(execution = {}) {
     node_status_counts: nodeStatusCounts,
     log_count: logCount,
     retry_count: countRetries(nodeRuns),
+    token_usage: createWorkflowTokenUsageRecord(execution.usage ?? {}),
+    cost: createWorkflowCostRecord(execution.cost ?? {}),
+    trace_span_count: normalizeTraceSpans(execution.trace_spans).length,
     has_error_branch: normalizeErrorBranches(execution.plan?.error_branches).length > 0
   });
 }
@@ -161,6 +166,24 @@ export function createWorkflowExecutionTimeline({
         })
       );
     }
+  }
+
+  for (const span of normalizeTraceSpans(execution.trace_spans)) {
+    events.push(
+      createTimelineEvent({
+        type: "trace_span",
+        timestamp: span.started_at,
+        execution_id: execution.id,
+        span_id: span.id,
+        node_id: span.node_id,
+        parent_span_id: span.parent_span_id,
+        name: span.name,
+        kind: span.kind,
+        status: span.status,
+        duration_ms: span.duration_ms,
+        attributes: span.attributes
+      })
+    );
   }
 
   if (execution.finished_at) {
@@ -234,8 +257,9 @@ function timelineEventRank(type) {
     execution_queued: 0,
     node_started: 1,
     node_log: 2,
-    node_finished: 3,
-    execution_finished: 4
+    trace_span: 3,
+    node_finished: 4,
+    execution_finished: 5
   }[type] ?? 99;
 }
 
@@ -273,6 +297,18 @@ function normalizeNodeLogs(logs) {
   }
 
   return logs;
+}
+
+function normalizeTraceSpans(traceSpans = []) {
+  if (traceSpans === undefined || traceSpans === null) {
+    return [];
+  }
+
+  if (!Array.isArray(traceSpans)) {
+    throw new TypeError("Execution trace_spans must be an array.");
+  }
+
+  return traceSpans;
 }
 
 function normalizeErrorBranches(errorBranches) {

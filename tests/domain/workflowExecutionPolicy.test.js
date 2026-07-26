@@ -5,13 +5,20 @@ import {
   WORKFLOW_EXECUTION_STATUSES,
   WORKFLOW_NODE_LOG_LEVELS,
   WORKFLOW_NODE_RUN_STATUSES,
+  WORKFLOW_TRACE_SPAN_KINDS,
+  WORKFLOW_TRACE_SPAN_STATUSES,
   WORKFLOW_TRIGGER_SOURCES,
+  createWorkflowCostRecord,
   createWorkflowExecutionRecord,
   createWorkflowNodeLogRecord,
   createWorkflowNodeRunRecord,
+  createWorkflowTokenUsageRecord,
+  createWorkflowTraceSpanRecord,
   isTerminalExecutionStatus,
   isTerminalNodeRunStatus,
-  normalizeExecutionError
+  normalizeExecutionError,
+  sumWorkflowCostRecords,
+  sumWorkflowTokenUsageRecords
 } from "../../src/domain/workflowExecutionPolicy.js";
 
 const timestamp = "2026-07-26T00:00:00.000Z";
@@ -38,9 +45,84 @@ test("workflow execution policy creates frozen execution records", () => {
   assert.equal(execution.status, WORKFLOW_EXECUTION_STATUSES.QUEUED);
   assert.equal(execution.trigger_source, WORKFLOW_TRIGGER_SOURCES.MANUAL);
   assert.equal(execution.mode, WORKFLOW_EXECUTION_MODES.MANUAL);
+  assert.deepEqual(execution.usage, {
+    input_tokens: 0,
+    output_tokens: 0,
+    total_tokens: 0
+  });
+  assert.deepEqual(execution.cost, {
+    amount: 0,
+    currency: "USD"
+  });
+  assert.deepEqual(execution.trace_spans, []);
   assert.equal(execution.node_runs[0].status, WORKFLOW_NODE_RUN_STATUSES.QUEUED);
   assert.deepEqual(execution.node_runs[0].logs, []);
   assert.equal(Object.isFrozen(execution.node_runs[0]), true);
+});
+
+test("workflow execution policy validates usage, cost, and trace spans", () => {
+  const usage = createWorkflowTokenUsageRecord({
+    input_tokens: 40,
+    output_tokens: 10
+  });
+  const cost = createWorkflowCostRecord({
+    amount: 0.0123456,
+    currency: "usd"
+  });
+  const span = createWorkflowTraceSpanRecord({
+    id: "trace_span_1",
+    execution_id: "execution_1",
+    node_id: "agent",
+    name: "Agent model call",
+    kind: WORKFLOW_TRACE_SPAN_KINDS.MODEL,
+    status: WORKFLOW_TRACE_SPAN_STATUSES.OK,
+    started_at: timestamp,
+    finished_at: timestamp,
+    duration_ms: 0,
+    attributes: { model: "gpt-4.1-mini" }
+  });
+  const nodeRun = createWorkflowNodeRunRecord({
+    id: "node_run_1",
+    execution_id: "execution_1",
+    node_id: "agent",
+    usage,
+    cost,
+    trace_span_id: span.id
+  });
+
+  assert.deepEqual(usage, {
+    input_tokens: 40,
+    output_tokens: 10,
+    total_tokens: 50
+  });
+  assert.deepEqual(cost, {
+    amount: 0.012346,
+    currency: "USD"
+  });
+  assert.equal(span.kind, WORKFLOW_TRACE_SPAN_KINDS.MODEL);
+  assert.equal(nodeRun.trace_span_id, "trace_span_1");
+  assert.deepEqual(
+    sumWorkflowTokenUsageRecords([
+      { input_tokens: 10, output_tokens: 2 },
+      { input_tokens: 5, output_tokens: 3 }
+    ]),
+    { input_tokens: 15, output_tokens: 5, total_tokens: 20 }
+  );
+  assert.deepEqual(
+    sumWorkflowCostRecords([
+      { amount: 0.01 },
+      { amount: 0.02 }
+    ]),
+    { amount: 0.03, currency: "USD" }
+  );
+  assert.throws(
+    () => createWorkflowTokenUsageRecord({
+      input_tokens: 1,
+      output_tokens: 1,
+      total_tokens: 3
+    }),
+    /total_tokens/
+  );
 });
 
 test("workflow execution policy validates node log records", () => {

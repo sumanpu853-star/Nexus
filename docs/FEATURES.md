@@ -24,7 +24,7 @@ In simple terms: n8n-style automation plus Botpress-style AI agents, with produc
 | AI Agents | Agent node with tools, memory, model selection, prompt/instruction editor, tool-call visibility | P1 | Planned |
 | Integrations | HTTP, Slack/Teams, Gmail/Outlook, Google Drive, GitHub, databases, webhooks, schedules | P1 | Planned |
 | Deployment | Save/publish states, webhook URLs, environment variables, dev/stage/prod separation | P1 | Planned |
-| Observability | Logs, traces, metrics, cost tracking, token usage, latency, failure-rate dashboards | P1 | Planned |
+| Observability | Logs, traces, metrics, cost tracking, token usage, latency, failure-rate dashboards | P1 | In progress |
 | Collaboration | Workflow versions, compare, restore, comments, templates, import/export | P2 | Planned |
 | Human-in-loop | Approval node, manual review queue, human handoff, timeout/fallback path | P2 | Planned |
 | Marketplace | Plugin SDK, custom node packaging, verified community nodes, private nodes | P2 | Planned |
@@ -50,7 +50,7 @@ Fix the current blockers first:
 
 ### Phase 3: Execution Platform
 
-- Store every execution with status, duration, `started_by`, trigger type, per-node input/output, and error. Foundation implemented with project-scoped execution records, node run snapshots, failure status, redaction, summarized history, node-level logs, diagnostic timelines, and HTTP handlers.
+- Store every execution with status, duration, `started_by`, trigger type, per-node input/output, and error. Foundation implemented with project-scoped execution records, node run snapshots, failure status, redaction, summarized history, node-level logs, diagnostic timelines, token/cost rollups, trace spans, observability reports, and HTTP handlers.
 - Add retry policies, timeout policies, and error branches. Node-level retry/timeout policy validation and error branch planning are implemented before execution runner work.
 - Add manual, production, and webhook execution modes. Mode and trigger validation are implemented at the execution record boundary.
 
@@ -60,7 +60,7 @@ Fix the current blockers first:
 - Add tool permission controls.
 - Add memory options: session memory, user memory, and semantic memory.
 - Add prompt/version history and model selection.
-- Add cost/token tracking.
+- Add cost/token tracking. Foundation implemented at the execution and node-run observability boundary.
 
 ### Phase 5: Enterprise And Scale
 
@@ -114,7 +114,7 @@ Each execution should track:
 - status: `queued`, `running`, `success`, `failed`, or `cancelled`
 - node run records
 - redacted state snapshots
-- duration, token usage, and cost
+- duration, token usage, cost, and trace spans
 - error message and failed node ID
 
 ## Differentiating Features
@@ -147,6 +147,7 @@ These implementation foundations are completed so far:
 | Workflow node retry and timeout policy validation before persistence | Completed |
 | Workflow error branches, execution records, and partial rerun planning | Completed |
 | P1 execution history summaries, node-level logs, timelines, and failed-node rerun routes | Completed |
+| P1 execution token/cost rollups, trace spans, metrics, and observability report route | Completed |
 | Schema-driven node catalog and workflow node parameter validation | Completed |
 | Workflow templates and builder form contract | Completed |
 

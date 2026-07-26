@@ -2,7 +2,7 @@
 
 ## Status
 
-This repository now includes a small Node.js CLI that reviews the workspace against the architecture baseline. It also includes completed P0 foundations for authentication, signed sessions, auth/session HTTP handlers, RBAC, project-scoped workflow access, encrypted credentials, external secret provider resolution, secret redaction, safe execution gating, sandboxed runner boundaries, workflow DAG validation, workflow node retry/timeout policy validation, error branch planning, execution records, partial reruns, schema-driven node definitions, builder forms, and workflow templates. P1 execution diagnostics now add summarized execution history, node-level logs, diagnostic timelines, and execution HTTP routes.
+This repository now includes a small Node.js CLI that reviews the workspace against the architecture baseline. It also includes completed P0 foundations for authentication, signed sessions, auth/session HTTP handlers, RBAC, project-scoped workflow access, encrypted credentials, external secret provider resolution, secret redaction, safe execution gating, sandboxed runner boundaries, workflow DAG validation, workflow node retry/timeout policy validation, error branch planning, execution records, partial reruns, schema-driven node definitions, builder forms, and workflow templates. P1 execution diagnostics now add summarized execution history, node-level logs, diagnostic timelines, token/cost rollups, trace spans, observability reports, and execution HTTP routes.
 
 ## Guiding Principles
 
@@ -25,7 +25,7 @@ Dependencies should point inward: infrastructure and interfaces can depend on ap
 
 The repository reserves these directories for that shape:
 
-- `src/domain`: rules, entities, value objects, domain services, security policy, credential policy, redaction rules, execution safety policy, workflow graph policy, workflow node execution policy, node definition policy, workflow template policy, error branch policy, execution planning, execution record policy, and execution history policy.
+- `src/domain`: rules, entities, value objects, domain services, security policy, credential policy, redaction rules, execution safety policy, workflow graph policy, workflow node execution policy, node definition policy, workflow template policy, error branch policy, execution planning, execution record policy, execution history policy, and execution observability policy.
 - `src/application`: use cases, workflow orchestration, authentication, project-scoped access, credential vault orchestration, sandboxed runner orchestration, node catalog orchestration, workflow template orchestration, and workflow execution orchestration.
 - `src/interfaces`: delivery mechanisms such as HTTP, CLI, jobs, UI, event handlers, auth handlers, builder handlers, execution handlers, and framework-neutral route handlers.
 - `src/infrastructure`: persistence, encryption, external secret providers, external APIs, filesystems, queues, execution storage adapters, and vendor SDKs.

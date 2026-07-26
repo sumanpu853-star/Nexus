@@ -4,9 +4,12 @@ import {
   WORKFLOW_EXECUTION_STATUSES,
   WORKFLOW_NODE_LOG_LEVELS,
   WORKFLOW_NODE_RUN_STATUSES,
+  WORKFLOW_TRACE_SPAN_KINDS,
+  WORKFLOW_TRACE_SPAN_STATUSES,
   createWorkflowExecutionRecord,
   createWorkflowNodeLogRecord,
-  createWorkflowNodeRunRecord
+  createWorkflowNodeRunRecord,
+  createWorkflowTraceSpanRecord
 } from "../../src/domain/workflowExecutionPolicy.js";
 import {
   createWorkflowExecutionHistory,
@@ -42,6 +45,21 @@ test("workflow execution history filters, sorts, and summarizes executions", () 
     finished_at: "2026-07-26T00:01:03.000Z",
     duration_ms: 3000,
     failed_node_id: "http",
+    usage: { input_tokens: 10, output_tokens: 4 },
+    cost: { amount: 0.002 },
+    trace_spans: [
+      createWorkflowTraceSpanRecord({
+        id: "trace_span_1",
+        execution_id: "execution_2",
+        node_id: "http",
+        name: "HTTP request",
+        kind: WORKFLOW_TRACE_SPAN_KINDS.INTEGRATION,
+        status: WORKFLOW_TRACE_SPAN_STATUSES.ERROR,
+        started_at: "2026-07-26T00:01:00.000Z",
+        finished_at: "2026-07-26T00:01:03.000Z",
+        duration_ms: 3000
+      })
+    ],
     node_runs: [
       createWorkflowNodeRunRecord({
         id: "node_run_2",
@@ -78,6 +96,16 @@ test("workflow execution history filters, sorts, and summarizes executions", () 
   assert.equal(history.items[0].node_status_counts.failed, 1);
   assert.equal(history.items[0].log_count, 1);
   assert.equal(history.items[0].retry_count, 1);
+  assert.deepEqual(history.items[0].token_usage, {
+    input_tokens: 10,
+    output_tokens: 4,
+    total_tokens: 14
+  });
+  assert.deepEqual(history.items[0].cost, {
+    amount: 0.002,
+    currency: "USD"
+  });
+  assert.equal(history.items[0].trace_span_count, 1);
   assert.equal(history.page_info.total, 1);
 });
 
@@ -88,6 +116,19 @@ test("workflow execution timeline combines execution, node, and log events", () 
     failed_node_id: "http",
     finished_at: "2026-07-26T00:00:05.000Z",
     duration_ms: 5000,
+    trace_spans: [
+      createWorkflowTraceSpanRecord({
+        id: "trace_span_1",
+        execution_id: "execution_1",
+        node_id: "http",
+        name: "HTTP request",
+        kind: WORKFLOW_TRACE_SPAN_KINDS.INTEGRATION,
+        status: WORKFLOW_TRACE_SPAN_STATUSES.ERROR,
+        started_at: "2026-07-26T00:00:02.500Z",
+        finished_at: "2026-07-26T00:00:05.000Z",
+        duration_ms: 2500
+      })
+    ],
     node_runs: [
       createWorkflowNodeRunRecord({
         id: "node_run_1",
@@ -117,10 +158,18 @@ test("workflow execution timeline combines execution, node, and log events", () 
 
   assert.deepEqual(
     timeline.events.map((event) => event.type),
-    ["execution_queued", "node_started", "node_log", "node_finished", "execution_finished"]
+    [
+      "execution_queued",
+      "node_started",
+      "trace_span",
+      "node_log",
+      "node_finished",
+      "execution_finished"
+    ]
   );
-  assert.equal(timeline.events[2].message, "Calling upstream API");
-  assert.equal(timeline.events[4].failed_node_id, "http");
+  assert.equal(timeline.events[2].name, "HTTP request");
+  assert.equal(timeline.events[3].message, "Calling upstream API");
+  assert.equal(timeline.events[5].failed_node_id, "http");
 });
 
 function createExecution(overrides = {}) {

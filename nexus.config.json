@@ -191,6 +191,14 @@
         "guidance": "Keep execution history summaries and timelines in the domain layer."
       },
       {
+        "id": "workflow-execution-observability-policy-domain",
+        "title": "Workflow execution observability policy domain exists",
+        "target": "src/domain/workflowExecutionObservabilityPolicy.js",
+        "kind": "fileExists",
+        "severity": "required",
+        "guidance": "Keep execution metrics, cost, token, trace, and latency aggregation in the domain layer."
+      },
+      {
         "id": "application-layer",
         "title": "Application layer directory exists",
         "target": "src/application",

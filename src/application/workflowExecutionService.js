@@ -9,20 +9,28 @@ import {
   WORKFLOW_EXECUTION_MODES,
   WORKFLOW_EXECUTION_STATUSES,
   WORKFLOW_NODE_RUN_STATUSES,
+  WORKFLOW_TRACE_SPAN_KINDS,
+  WORKFLOW_TRACE_SPAN_STATUSES,
   WORKFLOW_TRIGGER_SOURCES,
   WorkflowExecutionValidationError,
   assertExecutionBelongsToProjectWorkflow,
   createWorkflowExecutionRecord,
   createWorkflowNodeLogRecord,
   createWorkflowNodeRunRecord,
+  createWorkflowTraceSpanRecord,
   isTerminalExecutionStatus,
   isTerminalNodeRunStatus,
-  normalizeExecutionError
+  normalizeExecutionError,
+  sumWorkflowCostRecords,
+  sumWorkflowTokenUsageRecords
 } from "../domain/workflowExecutionPolicy.js";
 import {
   createWorkflowExecutionHistory,
   createWorkflowExecutionTimeline
 } from "../domain/workflowExecutionHistoryPolicy.js";
+import {
+  createWorkflowExecutionObservabilityReport
+} from "../domain/workflowExecutionObservabilityPolicy.js";
 
 export function createWorkflowExecutionService({
   projectRepository,
@@ -165,6 +173,9 @@ export function createWorkflowExecutionService({
       input = null,
       output = null,
       error = null,
+      usage = null,
+      cost = null,
+      trace = null,
       secretValues = []
     } = {}) {
       const { project } = await authorizeProjectAction({
@@ -196,6 +207,18 @@ export function createWorkflowExecutionService({
       const existingNodeRun = execution.node_runs.find(
         (nodeRun) => nodeRun.node_id === node_id && nodeRun.attempt === attempt
       );
+      const traceSpan = trace === null
+        ? null
+        : createNodeTraceSpan({
+          idGenerator,
+          execution,
+          existingNodeRun,
+          node_id,
+          status,
+          trace,
+          timestamp,
+          secretValues
+        });
       const nodeRun = createWorkflowNodeRunRecord({
         id: existingNodeRun?.id ?? nextId(idGenerator, "node_run"),
         execution_id: execution.id,
@@ -206,6 +229,9 @@ export function createWorkflowExecutionService({
         output: output === null ? null : redactSnapshot(output, secretValues),
         error: error === null ? null : redactSnapshot(normalizeExecutionError(error), secretValues),
         logs: existingNodeRun?.logs ?? [],
+        usage: usage === null ? existingNodeRun?.usage ?? {} : usage,
+        cost: cost === null ? existingNodeRun?.cost ?? {} : cost,
+        trace_span_id: traceSpan?.id ?? existingNodeRun?.trace_span_id ?? null,
         started_at: existingNodeRun?.started_at ?? timestamp,
         finished_at: isTerminalNodeRunStatus(status) ? timestamp : null,
         duration_ms: isTerminalNodeRunStatus(status)
@@ -225,6 +251,14 @@ export function createWorkflowExecutionService({
           timestamp
         }),
         node_runs: nodeRuns,
+        usage: aggregateNodeRunUsage(nodeRuns),
+        cost: aggregateNodeRunCost(nodeRuns),
+        trace_spans: traceSpan
+          ? replaceTraceSpan({
+            trace_spans: execution.trace_spans ?? [],
+            traceSpan
+          })
+          : execution.trace_spans ?? [],
         updated_at: timestamp
       });
 
@@ -355,6 +389,29 @@ export function createWorkflowExecutionService({
       }
 
       return createWorkflowExecutionTimeline({ execution });
+    },
+
+    async getWorkflowExecutionObservability({
+      actor,
+      project_id,
+      workflow_id
+    } = {}) {
+      const { project } = await authorizeProjectAction({
+        actor,
+        projectRepository,
+        membershipRepository,
+        project_id,
+        permission: PROJECT_PERMISSIONS.READ_WORKFLOW
+      });
+      const workflow = await requireWorkflow({
+        workflowRepository,
+        workflow_id,
+        project_id: project.id
+      });
+
+      return createWorkflowExecutionObservabilityReport({
+        executions: await executionRepository.findByWorkflowId(workflow.id)
+      });
     },
 
     async listWorkflowExecutions({
@@ -564,6 +621,50 @@ function requireNodeRun({
   return nodeRun;
 }
 
+function createNodeTraceSpan({
+  idGenerator,
+  execution,
+  existingNodeRun,
+  node_id,
+  status,
+  trace,
+  timestamp,
+  secretValues
+}) {
+  if (!trace || typeof trace !== "object" || Array.isArray(trace)) {
+    throw new TypeError("Node run trace must be an object.");
+  }
+
+  const nodeId = typeof node_id === "string" ? node_id.trim() : "";
+  const startedAt = trace.started_at ?? existingNodeRun?.started_at ?? timestamp;
+  const finishedAt = trace.finished_at ?? (
+    isTerminalNodeRunStatus(status) ? timestamp : null
+  );
+
+  return createWorkflowTraceSpanRecord({
+    id: trace.id ?? existingNodeRun?.trace_span_id ?? nextId(idGenerator, "trace_span"),
+    execution_id: execution.id,
+    node_id: nodeId,
+    parent_span_id: trace.parent_span_id ?? null,
+    name: trace.name ?? nodeId,
+    kind: trace.kind ?? WORKFLOW_TRACE_SPAN_KINDS.NODE,
+    status: trace.status ?? resolveTraceStatus(status),
+    started_at: startedAt,
+    finished_at: finishedAt,
+    duration_ms: trace.duration_ms ?? (
+      finishedAt ? calculateDurationMs(startedAt, finishedAt) : null
+    ),
+    attributes: redactSnapshot(trace.attributes ?? {}, secretValues)
+  });
+}
+
+function resolveTraceStatus(nodeRunStatus) {
+  return [WORKFLOW_NODE_RUN_STATUSES.FAILED, WORKFLOW_NODE_RUN_STATUSES.CANCELLED]
+    .includes(nodeRunStatus)
+    ? WORKFLOW_TRACE_SPAN_STATUSES.ERROR
+    : WORKFLOW_TRACE_SPAN_STATUSES.OK;
+}
+
 function deriveExecutionState({
   execution,
   nodeRuns,
@@ -643,6 +744,29 @@ function replaceNodeRun({
   return node_runs.map((entry, index) =>
     index === existingIndex ? nodeRun : entry
   );
+}
+
+function replaceTraceSpan({
+  trace_spans,
+  traceSpan
+}) {
+  const existingIndex = trace_spans.findIndex((entry) => entry.id === traceSpan.id);
+
+  if (existingIndex === -1) {
+    return [...trace_spans, traceSpan];
+  }
+
+  return trace_spans.map((entry, index) =>
+    index === existingIndex ? traceSpan : entry
+  );
+}
+
+function aggregateNodeRunUsage(nodeRuns) {
+  return sumWorkflowTokenUsageRecords(nodeRuns.map((nodeRun) => nodeRun.usage ?? {}));
+}
+
+function aggregateNodeRunCost(nodeRuns) {
+  return sumWorkflowCostRecords(nodeRuns.map((nodeRun) => nodeRun.cost ?? {}));
 }
 
 function redactSnapshot(snapshot, secretValues) {

@@ -22,6 +22,19 @@ export const WORKFLOW_NODE_LOG_LEVELS = Object.freeze({
   ERROR: "error"
 });
 
+export const WORKFLOW_TRACE_SPAN_KINDS = Object.freeze({
+  WORKFLOW: "workflow",
+  NODE: "node",
+  TOOL: "tool",
+  MODEL: "model",
+  INTEGRATION: "integration"
+});
+
+export const WORKFLOW_TRACE_SPAN_STATUSES = Object.freeze({
+  OK: "ok",
+  ERROR: "error"
+});
+
 export const WORKFLOW_TRIGGER_SOURCES = Object.freeze({
   MANUAL: "manual",
   WEBHOOK: "webhook",
@@ -77,6 +90,9 @@ export function createWorkflowExecutionRecord({
   node_runs = [],
   plan = {},
   metadata = {},
+  usage = {},
+  cost = {},
+  trace_spans = [],
   started_at,
   finished_at = null,
   duration_ms = null,
@@ -111,6 +127,9 @@ export function createWorkflowExecutionRecord({
     node_runs: normalizeNodeRunArray(node_runs, "Execution node_runs"),
     plan: normalizePlainObject(plan, "Execution plan"),
     metadata: normalizePlainObject(metadata, "Execution metadata"),
+    usage: createWorkflowTokenUsageRecord(usage),
+    cost: createWorkflowCostRecord(cost),
+    trace_spans: normalizeTraceSpanArray(trace_spans, "Execution trace_spans"),
     started_at: normalizeTimestamp(started_at, "Execution started_at"),
     finished_at: normalizeNullableTimestamp(finished_at, "Execution finished_at"),
     duration_ms: normalizeNullableNonNegativeInteger(duration_ms, "Execution duration_ms"),
@@ -129,6 +148,9 @@ export function createWorkflowNodeRunRecord({
   output = null,
   error = null,
   logs = [],
+  usage = {},
+  cost = {},
+  trace_span_id = null,
   started_at = null,
   finished_at = null,
   duration_ms = null
@@ -143,9 +165,123 @@ export function createWorkflowNodeRunRecord({
     output: normalizeNullablePlainObject(output, "Node run output"),
     error: normalizeNullableError(error, "Node run error"),
     logs: normalizeNodeRunLogs(logs, "Node run logs"),
+    usage: createWorkflowTokenUsageRecord(usage),
+    cost: createWorkflowCostRecord(cost),
+    trace_span_id: normalizeNullableString(trace_span_id, "Node run trace_span_id"),
     started_at: normalizeNullableTimestamp(started_at, "Node run started_at"),
     finished_at: normalizeNullableTimestamp(finished_at, "Node run finished_at"),
     duration_ms: normalizeNullableNonNegativeInteger(duration_ms, "Node run duration_ms")
+  });
+}
+
+export function createWorkflowTokenUsageRecord({
+  input_tokens = 0,
+  output_tokens = 0,
+  total_tokens
+} = {}) {
+  const normalizedInputTokens = normalizeNonNegativeInteger(input_tokens, "Token usage input_tokens");
+  const normalizedOutputTokens = normalizeNonNegativeInteger(output_tokens, "Token usage output_tokens");
+  const inferredTotalTokens = normalizedInputTokens + normalizedOutputTokens;
+  const normalizedTotalTokens =
+    total_tokens === undefined
+      ? inferredTotalTokens
+      : normalizeNonNegativeInteger(total_tokens, "Token usage total_tokens");
+
+  if (normalizedTotalTokens !== inferredTotalTokens) {
+    throw new WorkflowExecutionValidationError(
+      "Token usage total_tokens must equal input_tokens plus output_tokens.",
+      {
+        code: "workflow_execution_token_usage_invalid",
+        details: {
+          input_tokens: normalizedInputTokens,
+          output_tokens: normalizedOutputTokens,
+          total_tokens: normalizedTotalTokens
+        }
+      }
+    );
+  }
+
+  return deepFreeze({
+    input_tokens: normalizedInputTokens,
+    output_tokens: normalizedOutputTokens,
+    total_tokens: normalizedTotalTokens
+  });
+}
+
+export function createWorkflowCostRecord({
+  amount = 0,
+  currency = "USD"
+} = {}) {
+  return deepFreeze({
+    amount: normalizeNonNegativeNumber(amount, "Workflow cost amount"),
+    currency: normalizeCurrency(currency)
+  });
+}
+
+export function createWorkflowTraceSpanRecord({
+  id,
+  execution_id,
+  node_id = null,
+  parent_span_id = null,
+  name,
+  kind = WORKFLOW_TRACE_SPAN_KINDS.NODE,
+  status = WORKFLOW_TRACE_SPAN_STATUSES.OK,
+  started_at,
+  finished_at = null,
+  duration_ms = null,
+  attributes = {}
+} = {}) {
+  return deepFreeze({
+    id: normalizeRequiredString(id, "Trace span id"),
+    execution_id: normalizeRequiredString(execution_id, "Trace span execution_id"),
+    node_id: normalizeNullableString(node_id, "Trace span node_id"),
+    parent_span_id: normalizeNullableString(parent_span_id, "Trace span parent_span_id"),
+    name: normalizeRequiredString(name, "Trace span name"),
+    kind: normalizeEnum(kind, WORKFLOW_TRACE_SPAN_KINDS, "Trace span kind"),
+    status: normalizeEnum(status, WORKFLOW_TRACE_SPAN_STATUSES, "Trace span status"),
+    started_at: normalizeTimestamp(started_at, "Trace span started_at"),
+    finished_at: normalizeNullableTimestamp(finished_at, "Trace span finished_at"),
+    duration_ms: normalizeNullableNonNegativeInteger(duration_ms, "Trace span duration_ms"),
+    attributes: normalizePlainObject(attributes, "Trace span attributes")
+  });
+}
+
+export function sumWorkflowTokenUsageRecords(records = []) {
+  const totals = normalizeArray(records, "Token usage records")
+    .map((record) => createWorkflowTokenUsageRecord(record))
+    .reduce(
+      (accumulator, record) => ({
+        input_tokens: accumulator.input_tokens + record.input_tokens,
+        output_tokens: accumulator.output_tokens + record.output_tokens
+      }),
+      { input_tokens: 0, output_tokens: 0 }
+    );
+
+  return createWorkflowTokenUsageRecord(totals);
+}
+
+export function sumWorkflowCostRecords(records = []) {
+  const normalizedRecords = normalizeArray(records, "Workflow cost records")
+    .map((record) => createWorkflowCostRecord(record));
+  const currency = normalizedRecords[0]?.currency ?? "USD";
+
+  for (const record of normalizedRecords) {
+    if (record.currency !== currency) {
+      throw new WorkflowExecutionValidationError(
+        "Workflow cost records must use one currency.",
+        {
+          code: "workflow_execution_cost_currency_mismatch",
+          details: { expected: currency, actual: record.currency }
+        }
+      );
+    }
+  }
+
+  return createWorkflowCostRecord({
+    amount: roundNumber(
+      normalizedRecords.reduce((total, record) => total + record.amount, 0)
+    ),
+    currency
   });
 }
 
@@ -239,6 +375,22 @@ function normalizePositiveInteger(value, field) {
   return value;
 }
 
+function normalizeNonNegativeInteger(value, field) {
+  if (!Number.isInteger(value) || value < 0) {
+    throw new WorkflowExecutionValidationError(`${field} must be a non-negative integer.`);
+  }
+
+  return value;
+}
+
+function normalizeNonNegativeNumber(value, field) {
+  if (typeof value !== "number" || !Number.isFinite(value) || value < 0) {
+    throw new WorkflowExecutionValidationError(`${field} must be a non-negative number.`);
+  }
+
+  return roundNumber(value);
+}
+
 function normalizeNullableNonNegativeInteger(value, field) {
   if (value === null) {
     return null;
@@ -297,6 +449,14 @@ function normalizeNullableError(value, field) {
   return normalizePlainObject(value, field);
 }
 
+function normalizeArray(value, field) {
+  if (!Array.isArray(value)) {
+    throw new WorkflowExecutionValidationError(`${field} must be an array.`);
+  }
+
+  return value.map((entry) => deepClone(entry));
+}
+
 function normalizeNodeRunArray(value, field) {
   if (!Array.isArray(value)) {
     throw new WorkflowExecutionValidationError(`${field} must be an array.`);
@@ -311,6 +471,28 @@ function normalizeNodeRunLogs(value, field) {
   }
 
   return value.map((entry) => createWorkflowNodeLogRecord(entry));
+}
+
+function normalizeTraceSpanArray(value, field) {
+  if (!Array.isArray(value)) {
+    throw new WorkflowExecutionValidationError(`${field} must be an array.`);
+  }
+
+  return value.map((entry) => createWorkflowTraceSpanRecord(entry));
+}
+
+function normalizeCurrency(value) {
+  const normalized = normalizeRequiredString(value, "Workflow cost currency").toUpperCase();
+
+  if (!/^[A-Z]{3}$/.test(normalized)) {
+    throw new WorkflowExecutionValidationError("Workflow cost currency must be a 3-letter ISO code.");
+  }
+
+  return normalized;
+}
+
+function roundNumber(value) {
+  return Number(value.toFixed(6));
 }
 
 function deepClone(value) {
