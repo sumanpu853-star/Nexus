@@ -135,6 +135,14 @@
         "guidance": "Keep retry and timeout policy validation in the domain layer before adding execution runners."
       },
       {
+        "id": "node-definition-policy-domain",
+        "title": "Node definition policy domain exists",
+        "target": "src/domain/nodeDefinitionPolicy.js",
+        "kind": "fileExists",
+        "severity": "required",
+        "guidance": "Keep schema-driven node definitions and parameter validation in the domain layer."
+      },
+      {
         "id": "workflow-error-branch-policy-domain",
         "title": "Workflow error branch policy domain exists",
         "target": "src/domain/workflowErrorBranchPolicy.js",
@@ -191,6 +199,14 @@
         "guidance": "Keep execution queuing, node-run updates, and partial reruns in application orchestration."
       },
       {
+        "id": "node-catalog-service",
+        "title": "Node catalog service exists",
+        "target": "src/application/nodeCatalogService.js",
+        "kind": "fileExists",
+        "severity": "required",
+        "guidance": "Expose node definitions through application orchestration before adding UI or HTTP adapters."
+      },
+      {
         "id": "credential-vault-service",
         "title": "Credential vault service exists",
         "target": "src/application/credentialVaultService.js",
@@ -205,6 +221,14 @@
         "kind": "directoryExists",
         "severity": "required",
         "guidance": "Keep delivery mechanisms at the edge of the system."
+      },
+      {
+        "id": "node-catalog-http-handler",
+        "title": "Node catalog HTTP handler exists",
+        "target": "src/interfaces/nodeCatalogHttpHandler.js",
+        "kind": "fileExists",
+        "severity": "required",
+        "guidance": "Keep the GET /nodes delivery adapter separate from node catalog domain rules."
       },
       {
         "id": "infrastructure-layer",

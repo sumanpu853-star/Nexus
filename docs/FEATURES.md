@@ -18,7 +18,7 @@ In simple terms: n8n-style automation plus Botpress-style AI agents, with produc
 | Workflow Engine | DAG validation, branching, joins, retries, timeouts, error workflows, partial execution | P0 | Completed |
 | Safe Execution | Replace raw `python_script` execution with a sandboxed code runner or disabled production mode | P0 | In progress |
 | Credentials | Encrypted vault, credential ownership, credential sharing, external secret provider support | P0 | In progress |
-| Builder UX | Schema-driven node forms instead of raw JSON textareas | P0 | Planned |
+| Builder UX | Schema-driven node forms instead of raw JSON textareas | P0 | In progress |
 | Executions | Execution history, node-level logs, input/output snapshots, rerun from failed node | P1 | In progress |
 | RAG | Knowledge base manager, document ingestion, chunking, embedding, vector search, reranking | P1 | Planned |
 | AI Agents | Agent node with tools, memory, model selection, prompt/instruction editor, tool-call visibility | P1 | Planned |
@@ -43,9 +43,9 @@ Fix the current blockers first:
 
 ### Phase 2: Workflow Builder Upgrade
 
-- Replace raw JSON config with typed forms.
-- Add node schemas exposed from the backend through `GET /nodes`.
-- Add validation before workflow execution. DAG validation now blocks invalid graph shapes before workflow persistence.
+- Replace raw JSON config with typed forms. Foundation implemented with schema-driven node definitions and typed parameter metadata.
+- Add node schemas exposed from the backend through `GET /nodes`. Framework-neutral node catalog service and `/nodes` handler are implemented.
+- Add validation before workflow execution. DAG validation and node parameter schema validation now block invalid workflows before persistence.
 - Add workflow templates for common use cases.
 
 ### Phase 3: Execution Platform
@@ -130,7 +130,7 @@ Nexus should stand out through:
 
 ## Completed Foundation Work
 
-These items were completed before this product roadmap replaced the placeholder feature list:
+These implementation foundations are completed so far:
 
 | Feature | Status |
 | --- | --- |
@@ -142,6 +142,7 @@ These items were completed before this product roadmap replaced the placeholder 
 | Workflow DAG validation before persistence | Completed |
 | Workflow node retry and timeout policy validation before persistence | Completed |
 | Workflow error branches, execution records, and partial rerun planning | Completed |
+| Schema-driven node catalog and workflow node parameter validation | Completed |
 
 ## Implementation Rule
 

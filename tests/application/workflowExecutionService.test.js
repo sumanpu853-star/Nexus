@@ -204,9 +204,21 @@ async function createWorkflowFixture() {
     name: "HTTP With Error Branch",
     nodes: [
       { id: "manual", type: "manual" },
-      { id: "http", type: "http_request" },
-      { id: "notify", type: "slack" },
-      { id: "error_notify", type: "slack" }
+      {
+        id: "http",
+        type: "http_request",
+        parameters: { url: "https://example.com/api" }
+      },
+      {
+        id: "notify",
+        type: "slack",
+        parameters: { channel: "#ops", message: "Done" }
+      },
+      {
+        id: "error_notify",
+        type: "slack",
+        parameters: { channel: "#ops", message: "Failed" }
+      }
     ],
     edges: [
       { id: "manual_to_http", source: "manual", target: "http" },

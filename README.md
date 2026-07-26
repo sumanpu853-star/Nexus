@@ -12,6 +12,7 @@ Nexus is an architecture-first codebase baseline with a small Node.js CLI for re
 - P0 credential safety has started with encrypted credential storage, explicit sharing, and reusable secret redaction.
 - P0 safe execution has started by disabling `python_script` workflow nodes until a sandboxed runner exists.
 - P0 workflow engine foundation covers DAG validation, branching/joins, retry/timeout defaults, error branches, execution records, and partial rerun planning.
+- P0 builder UX foundation has started with schema-driven node definitions, workflow node parameter validation, and a `/nodes` catalog handler.
 - CI runs tests and the architecture review on pushes and pull requests.
 
 ## Repository Map
@@ -35,6 +36,7 @@ Nexus is an architecture-first codebase baseline with a small Node.js CLI for re
 - `docs/decisions/0012-workflow-dag-validation.md` records the workflow graph validation decision.
 - `docs/decisions/0013-workflow-node-retry-timeout-policy.md` records the node execution policy decision.
 - `docs/decisions/0014-workflow-execution-records-and-error-branches.md` records the execution planning decision.
+- `docs/decisions/0015-schema-driven-node-catalog.md` records the node catalog decision.
 - `nexus.config.json` defines the architecture checks used by the CLI and CI.
 - `src/` reserves the future production-code boundaries.
 - `tests/` reserves the future verification boundaries.
@@ -88,4 +90,4 @@ npm run print:config-schema
 
 ## Next Step
 
-Move to the next P0 item in `docs/FEATURES.md`: schema-driven node definitions for the builder UX.
+Continue Builder UX from `docs/FEATURES.md`: workflow templates and a real form-rendering surface over the node catalog.

@@ -161,9 +161,21 @@ test("createWorkflow persists error branch edge types and rejects duplicate erro
     name: "HTTP With Error Branch",
     nodes: [
       { id: "manual", type: "manual" },
-      { id: "http", type: "http_request" },
-      { id: "notify", type: "slack" },
-      { id: "error_notify", type: "slack" }
+      {
+        id: "http",
+        type: "http_request",
+        parameters: { url: "https://example.com/api" }
+      },
+      {
+        id: "notify",
+        type: "slack",
+        parameters: { channel: "#ops", message: "Done" }
+      },
+      {
+        id: "error_notify",
+        type: "slack",
+        parameters: { channel: "#ops", message: "Failed" }
+      }
     ],
     edges: [
       { id: "manual_to_http", source: "manual", target: "http" },
@@ -202,6 +214,71 @@ test("createWorkflow persists error branch edge types and rejects duplicate erro
     (error) => {
       assert.equal(error.name, "WorkflowErrorBranchPolicyError");
       assert.equal(error.violations[0].type, "duplicate_error_branch");
+      return true;
+    }
+  );
+});
+
+test("createWorkflow applies node definition defaults and rejects invalid parameters", async () => {
+  const repositories = createInMemorySecurityRepositories();
+  const service = createProjectWorkflowSecurityService({
+    projectRepository: repositories.projects,
+    membershipRepository: repositories.memberships,
+    workflowRepository: repositories.workflows,
+    idGenerator: sequenceIds(),
+    clock: () => new Date(timestamp)
+  });
+  const { project } = await service.createProjectForUser({
+    actor: { id: "owner_1" },
+    name: "AI Workflows"
+  });
+
+  const workflow = await service.createWorkflow({
+    actor: { id: "owner_1" },
+    project_id: project.id,
+    name: "Typed HTTP Workflow",
+    nodes: [
+      {
+        id: "http",
+        type: "http_request",
+        parameters: { url: "https://example.com/api" }
+      }
+    ]
+  });
+
+  assert.equal(workflow.nodes[0].label, "HTTP Request");
+  assert.deepEqual(workflow.nodes[0].parameters, {
+    method: "GET",
+    url: "https://example.com/api",
+    headers: {},
+    query: {},
+    body: {}
+  });
+  assert.deepEqual(workflow.nodes[0].credential_refs, {});
+
+  await assert.rejects(
+    () =>
+      service.createWorkflow({
+        actor: { id: "owner_1" },
+        project_id: project.id,
+        name: "Invalid Form Data",
+        nodes: [
+          {
+            id: "http",
+            type: "http_request",
+            parameters: {
+              url: "not-a-url",
+              raw_json: true
+            }
+          }
+        ]
+      }),
+    (error) => {
+      assert.equal(error.name, "WorkflowNodeDefinitionValidationError");
+      assert.deepEqual(
+        error.violations.map((violation) => violation.type),
+        ["unsupported_node_parameter", "invalid_node_parameter_format"]
+      );
       return true;
     }
   );
@@ -267,6 +344,7 @@ test("createWorkflow persists explicit retry and timeout policies", async () => 
       {
         id: "http",
         type: "http_request",
+        parameters: { url: "https://example.com/api" },
         timeout_ms: 15_000,
         retry_policy: {
           max_attempts: 3,
@@ -311,6 +389,7 @@ test("createWorkflow rejects invalid retry and timeout policies before persisten
           {
             id: "http",
             type: "http_request",
+            parameters: { url: "https://example.com/api" },
             timeout_ms: 0,
             retry_policy: {
               max_attempts: 10
