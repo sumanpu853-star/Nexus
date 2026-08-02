@@ -25,7 +25,7 @@ In simple terms: n8n-style automation plus Botpress-style AI agents, with produc
 | Integrations | HTTP, Slack/Teams, Gmail/Outlook, Google Drive, GitHub, databases, webhooks, schedules | P1 | In progress |
 | Deployment | Save/publish states, webhook URLs, environment variables, dev/stage/prod separation | P1 | In progress |
 | Observability | Logs, traces, metrics, cost tracking, token usage, latency, failure-rate dashboards | P1 | Completed |
-| Collaboration | Workflow versions, compare, restore, comments, templates, import/export | P2 | Planned |
+| Collaboration | Workflow versions, compare, restore, comments, templates, import/export | P2 | Completed |
 | Human-in-loop | Approval node, manual review queue, human handoff, timeout/fallback path | P2 | Planned |
 | Marketplace | Plugin SDK, custom node packaging, verified community nodes, private nodes | P2 | Planned |
 
@@ -70,6 +70,14 @@ Fix the current blockers first:
 - Add source control or workflow version export to Git. Foundation implemented with canonical workflow export files, manifest generation, source-control export records, and a source-control gateway boundary.
 - Add external secrets integration. Foundation implemented with environment-backed secret resolution and chained provider fallback on the existing credential vault boundary.
 - Add audit logs and an admin dashboard. Foundation implemented with audit event records, filtering, summaries, admin-gated listing, dashboard snapshots, and HTTP routes.
+
+### P2 Collaboration
+
+- Add workflow versions. Foundation implemented with immutable project-scoped workflow version snapshots and durable repository adapters.
+- Add compare and restore. Foundation implemented with workflow version diff summaries and permission-gated restore that creates a new draft version.
+- Add comments. Foundation implemented with workflow/node/version comments, metadata, resolution state, filtering, and HTTP routes.
+- Add templates. Foundation implemented with collaboration templates created from workflow versions and project-scoped listing.
+- Add import/export. Foundation implemented with portable workflow collaboration packages that include workflow state, versions, comments, and templates.
 
 ## Feature Spec Highlights
 
@@ -270,6 +278,50 @@ Each workflow queue job should include:
 - `created_at`
 - `updated_at`
 
+### Workflow Collaboration Object
+
+Each workflow version should include:
+
+- `id`
+- `project_id`
+- `workflow_id`
+- `version`
+- `name`
+- `description`
+- `nodes`
+- `edges`
+- `settings`
+- `change_summary`
+- `source`
+- `restored_from_version`
+- `created_by`
+- `created_at`
+
+Each workflow comment should include:
+
+- `id`
+- `project_id`
+- `workflow_id`
+- `version`
+- `node_id`
+- `body`
+- `author_id`
+- `status`
+- `metadata`
+- `created_at`
+- `resolved_by`
+- `resolved_at`
+
+Each workflow collaboration package should include:
+
+- `format`
+- `workflow`
+- `versions`
+- `comments`
+- `templates`
+- `exported_by`
+- `exported_at`
+
 ## Differentiating Features
 
 Nexus should stand out through:
@@ -315,6 +367,7 @@ These implementation foundations are completed so far:
 | Phase 5 workflow source-control export records, canonical files, manifest, and gateway boundary | Completed |
 | Phase 5 environment-backed external secret provider and chained provider fallback | Completed |
 | Phase 5 audit event records, admin-gated audit queries, dashboard snapshot aggregation, and HTTP routes | Completed |
+| P2 workflow version snapshots, compare/diff summaries, restore, comments, templates, portable import/export packages, and HTTP routes | Completed |
 | Schema-driven node catalog and workflow node parameter validation | Completed |
 | Workflow templates and builder form contract | Completed |
 

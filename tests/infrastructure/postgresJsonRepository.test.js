@@ -103,6 +103,22 @@ test("postgres runtime repositories expose phase 5 enterprise ports", async () =
     workflow_id: "workflow_1",
     project_id: "project_1"
   });
+  await repositories.workflowVersions.save({
+    id: "version_1",
+    workflow_id: "workflow_1",
+    project_id: "project_1",
+    version: 1
+  });
+  await repositories.workflowComments.save({
+    id: "comment_1",
+    workflow_id: "workflow_1",
+    project_id: "project_1"
+  });
+  await repositories.workflowCollaborationTemplates.save({
+    id: "template_1",
+    workflow_id: "workflow_1",
+    project_id: "project_1"
+  });
   await repositories.auditEvents.save({
     id: "audit_1",
     action: "workspace.created"
@@ -112,6 +128,9 @@ test("postgres runtime repositories expose phase 5 enterprise ports", async () =
   assert.equal((await repositories.workspaceMemberships.findByWorkspaceId(workspace.id)).length, 2);
   assert.equal((await repositories.workspaceProjectLinks.findByProjectId("project_1")).workspace_id, workspace.id);
   assert.equal((await repositories.workflowExports.findByWorkflowId("workflow_1"))[0].id, "export_1");
+  assert.equal((await repositories.workflowVersions.findByWorkflowId("workflow_1"))[0].id, "version_1");
+  assert.equal((await repositories.workflowComments.findByWorkflowId("workflow_1"))[0].id, "comment_1");
+  assert.equal((await repositories.workflowCollaborationTemplates.findByProjectId("project_1"))[0].id, "template_1");
   assert.equal((await repositories.auditEvents.findAll()).length, 1);
 });
 

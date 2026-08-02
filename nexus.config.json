@@ -271,6 +271,14 @@
         "guidance": "Keep workflow export files and source-control export records in the domain layer."
       },
       {
+        "id": "workflow-collaboration-policy-domain",
+        "title": "Workflow collaboration policy domain exists",
+        "target": "src/domain/workflowCollaborationPolicy.js",
+        "kind": "fileExists",
+        "severity": "required",
+        "guidance": "Keep workflow versions, diffs, comments, collaboration templates, and packages in the domain layer."
+      },
+      {
         "id": "audit-policy-domain",
         "title": "Audit policy domain exists",
         "target": "src/domain/auditPolicy.js",
@@ -431,6 +439,14 @@
         "guidance": "Keep workflow export orchestration and source-control gateway access behind an application service boundary."
       },
       {
+        "id": "workflow-collaboration-service",
+        "title": "Workflow collaboration service exists",
+        "target": "src/application/workflowCollaborationService.js",
+        "kind": "fileExists",
+        "severity": "required",
+        "guidance": "Keep workflow versioning, compare, restore, comments, templates, and import/export behind an application service boundary."
+      },
+      {
         "id": "audit-log-service",
         "title": "Audit log service exists",
         "target": "src/application/auditLogService.js",
@@ -577,6 +593,14 @@
         "kind": "fileExists",
         "severity": "required",
         "guidance": "Keep admin dashboard and audit delivery routes separate from application orchestration."
+      },
+      {
+        "id": "workflow-collaboration-http-handler",
+        "title": "Workflow collaboration HTTP handler exists",
+        "target": "src/interfaces/workflowCollaborationHttpHandler.js",
+        "kind": "fileExists",
+        "severity": "required",
+        "guidance": "Keep workflow collaboration delivery routes separate from application orchestration."
       },
       {
         "id": "infrastructure-layer",
@@ -793,6 +817,14 @@
         "kind": "fileExists",
         "severity": "required",
         "guidance": "Keep workflow export persistence behind repository adapters."
+      },
+      {
+        "id": "workflow-collaboration-repositories",
+        "title": "Workflow collaboration repositories exist",
+        "target": "src/infrastructure/inMemoryWorkflowCollaborationRepositories.js",
+        "kind": "fileExists",
+        "severity": "required",
+        "guidance": "Keep workflow versions, comments, and collaboration templates behind repository adapters."
       },
       {
         "id": "workflow-source-control-gateway",

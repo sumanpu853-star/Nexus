@@ -233,6 +233,21 @@ export function createPostgresRuntimeRepositories({
       tableName,
       resource: "workflow_exports"
     }),
+    workflowVersions: createPostgresJsonRepository({
+      sqlClient,
+      tableName,
+      resource: "workflow_versions"
+    }),
+    workflowComments: createPostgresJsonRepository({
+      sqlClient,
+      tableName,
+      resource: "workflow_comments"
+    }),
+    workflowCollaborationTemplates: createPostgresJsonRepository({
+      sqlClient,
+      tableName,
+      resource: "workflow_collaboration_templates"
+    }),
     persistenceMigrations: createPostgresJsonRepository({
       sqlClient,
       tableName,

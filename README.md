@@ -23,6 +23,7 @@ Nexus is an architecture-first codebase baseline with a small Node.js CLI for re
 - P1 runtime foundation covers durable repository ports, migration metadata, a local JSON durable store, queue jobs, leases, retries, dead-lettering, queue summaries, and queue routes.
 - P1 execution worker runtime covers queue-backed job claiming, deterministic node execution, result/log recording, business failure capture, worker retry/dead-letter handling, and worker control routes.
 - Phase 5 enterprise foundations cover Redis-style queue storage, Postgres-style durable runtime repositories, workspace RBAC, workflow export-to-source-control boundaries, environment external secrets, audit logs, and an admin dashboard.
+- P2 collaboration foundation covers workflow versions, compare/diff, restore, comments, templates from versions, and portable workflow collaboration import/export packages.
 - The LanceDB overwrite blocker was audited and is not applicable until vector-store code is introduced.
 - CI runs tests and the architecture review on pushes and pull requests.
 
@@ -62,6 +63,7 @@ Nexus is an architecture-first codebase baseline with a small Node.js CLI for re
 - `docs/decisions/0026-p1-execution-worker-runtime.md` records the queue-backed execution worker decision.
 - `docs/decisions/0027-phase-4-agent-workflow-runtime.md` records the persisted agent workflow-node runtime decision.
 - `docs/decisions/0028-phase-5-enterprise-scale-foundations.md` records the enterprise scale foundation decision.
+- `docs/decisions/0029-p2-workflow-collaboration-foundation.md` records the workflow collaboration decision.
 - `nexus.config.json` defines the architecture checks used by the CLI and CI.
 - `src/` reserves the future production-code boundaries.
 - `tests/` reserves the future verification boundaries.
@@ -115,4 +117,4 @@ npm run print:config-schema
 
 ## Next Step
 
-Move into P2 collaboration from `docs/FEATURES.md`: workflow versions, compare, restore, comments, templates, and import/export polishing.
+Move into P2 human-in-loop from `docs/FEATURES.md`: approval nodes, manual review queues, human handoff, and timeout/fallback paths.
