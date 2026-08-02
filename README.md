@@ -20,6 +20,8 @@ Nexus is an architecture-first codebase baseline with a small Node.js CLI for re
 - P1 integrations foundation covers integration catalog, project-scoped connections, credential binding, deterministic gateway, webhooks, schedules, and node schemas.
 - P1 deployment foundation covers dev/stage/prod environments, safe environment variables, publish records, active deployment lookup, and stable webhook URLs.
 - P1 production adapter readiness covers a required adapter catalog, safe adapter configs, deterministic health checks, readiness reports, and production adapter routes.
+- P1 runtime foundation covers durable repository ports, migration metadata, a local JSON durable store, queue jobs, leases, retries, dead-lettering, queue summaries, and queue routes.
+- P1 execution worker runtime covers queue-backed job claiming, deterministic node execution, result/log recording, business failure capture, worker retry/dead-letter handling, and worker control routes.
 - The LanceDB overwrite blocker was audited and is not applicable until vector-store code is introduced.
 - CI runs tests and the architecture review on pushes and pull requests.
 
@@ -55,6 +57,8 @@ Nexus is an architecture-first codebase baseline with a small Node.js CLI for re
 - `docs/decisions/0022-p1-deployment-foundation.md` records the deployment environment, publish, and webhook URL decision.
 - `docs/decisions/0023-p1-observability-dashboard.md` records the dashboard-ready execution observability decision.
 - `docs/decisions/0024-p1-production-adapter-readiness.md` records the production adapter catalog, config, health, and readiness decision.
+- `docs/decisions/0025-p1-durable-persistence-and-queue-runtime.md` records the durable persistence and queue runtime foundation decision.
+- `docs/decisions/0026-p1-execution-worker-runtime.md` records the queue-backed execution worker decision.
 - `nexus.config.json` defines the architecture checks used by the CLI and CI.
 - `src/` reserves the future production-code boundaries.
 - `tests/` reserves the future verification boundaries.
@@ -108,4 +112,4 @@ npm run print:config-schema
 
 ## Next Step
 
-Continue P1 from `docs/FEATURES.md`: replace deterministic foundations with concrete production adapters for persistence, queueing, vector search, model providers, integrations, scheduling, sandboxing, and external secrets.
+Continue P1 from `docs/FEATURES.md`: replace deterministic/local runtime foundations with concrete production adapters, starting with Postgres/Redis-style persistence and queue providers, then vector search, model providers, integrations, scheduling, sandboxing, and external secrets.

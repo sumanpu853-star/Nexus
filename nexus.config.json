@@ -239,6 +239,22 @@
         "guidance": "Keep production adapter catalog, config, health, and readiness rules in the domain layer."
       },
       {
+        "id": "durable-persistence-policy-domain",
+        "title": "Durable persistence policy domain exists",
+        "target": "src/domain/durablePersistencePolicy.js",
+        "kind": "fileExists",
+        "severity": "required",
+        "guidance": "Keep durable repository port, migration, and persistence readiness rules in the domain layer."
+      },
+      {
+        "id": "workflow-queue-policy-domain",
+        "title": "Workflow queue policy domain exists",
+        "target": "src/domain/workflowQueuePolicy.js",
+        "kind": "fileExists",
+        "severity": "required",
+        "guidance": "Keep queue job, leasing, retry, and dead-letter rules in the domain layer."
+      },
+      {
         "id": "application-layer",
         "title": "Application layer directory exists",
         "target": "src/application",
@@ -269,6 +285,22 @@
         "kind": "fileExists",
         "severity": "required",
         "guidance": "Keep execution queuing, node-run updates, and partial reruns in application orchestration."
+      },
+      {
+        "id": "workflow-queue-service",
+        "title": "Workflow queue service exists",
+        "target": "src/application/workflowQueueService.js",
+        "kind": "fileExists",
+        "severity": "required",
+        "guidance": "Keep worker queue leasing, completion, retry, and summaries in application orchestration."
+      },
+      {
+        "id": "workflow-execution-worker-service",
+        "title": "Workflow execution worker service exists",
+        "target": "src/application/workflowExecutionWorkerService.js",
+        "kind": "fileExists",
+        "severity": "required",
+        "guidance": "Keep workflow execution worker orchestration behind an application service boundary."
       },
       {
         "id": "sandboxed-runner-service",
@@ -341,6 +373,14 @@
         "kind": "fileExists",
         "severity": "required",
         "guidance": "Keep production adapter configuration, health checks, and readiness orchestration behind a service boundary."
+      },
+      {
+        "id": "runtime-persistence-service",
+        "title": "Runtime persistence service exists",
+        "target": "src/application/runtimePersistenceService.js",
+        "kind": "fileExists",
+        "severity": "required",
+        "guidance": "Keep durable persistence migration and readiness orchestration behind a service boundary."
       },
       {
         "id": "interfaces-layer",
@@ -433,6 +473,30 @@
         "kind": "fileExists",
         "severity": "required",
         "guidance": "Keep production adapter delivery routes separate from application orchestration."
+      },
+      {
+        "id": "runtime-persistence-http-handler",
+        "title": "Runtime persistence HTTP handler exists",
+        "target": "src/interfaces/runtimePersistenceHttpHandler.js",
+        "kind": "fileExists",
+        "severity": "required",
+        "guidance": "Keep runtime persistence readiness routes separate from application orchestration."
+      },
+      {
+        "id": "workflow-queue-http-handler",
+        "title": "Workflow queue HTTP handler exists",
+        "target": "src/interfaces/workflowQueueHttpHandler.js",
+        "kind": "fileExists",
+        "severity": "required",
+        "guidance": "Keep workflow queue worker routes separate from application orchestration."
+      },
+      {
+        "id": "workflow-execution-worker-http-handler",
+        "title": "Workflow execution worker HTTP handler exists",
+        "target": "src/interfaces/workflowExecutionWorkerHttpHandler.js",
+        "kind": "fileExists",
+        "severity": "required",
+        "guidance": "Keep workflow execution worker control routes separate from application orchestration."
       },
       {
         "id": "infrastructure-layer",
@@ -569,6 +633,38 @@
         "kind": "fileExists",
         "severity": "required",
         "guidance": "Keep production adapter health checks behind a gateway boundary so real providers can be swapped in."
+      },
+      {
+        "id": "persistence-metadata-repository",
+        "title": "Persistence metadata repository exists",
+        "target": "src/infrastructure/inMemoryPersistenceMetadataRepository.js",
+        "kind": "fileExists",
+        "severity": "required",
+        "guidance": "Keep persistence migration metadata behind a repository adapter."
+      },
+      {
+        "id": "workflow-queue-repository",
+        "title": "Workflow queue repository exists",
+        "target": "src/infrastructure/inMemoryWorkflowQueueRepository.js",
+        "kind": "fileExists",
+        "severity": "required",
+        "guidance": "Keep queue job persistence and leasing behind a repository adapter."
+      },
+      {
+        "id": "json-file-durable-store",
+        "title": "JSON file durable store exists",
+        "target": "src/infrastructure/jsonFileDurableStore.js",
+        "kind": "fileExists",
+        "severity": "required",
+        "guidance": "Keep the dependency-free durable snapshot adapter available for local production-like persistence."
+      },
+      {
+        "id": "workflow-node-runner",
+        "title": "Workflow node runner adapter exists",
+        "target": "src/infrastructure/deterministicWorkflowNodeRunner.js",
+        "kind": "fileExists",
+        "severity": "required",
+        "guidance": "Keep workflow node execution behind a runner adapter so production providers can replace deterministic execution."
       },
       {
         "id": "tests-directory",

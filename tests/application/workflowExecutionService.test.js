@@ -10,7 +10,13 @@ import {
   WORKFLOW_TRACE_SPAN_KINDS,
   WORKFLOW_TRIGGER_SOURCES
 } from "../../src/domain/workflowExecutionPolicy.js";
+import {
+  WORKFLOW_QUEUE_JOB_TYPES
+} from "../../src/domain/workflowQueuePolicy.js";
 import { createInMemorySecurityRepositories } from "../../src/infrastructure/inMemorySecurityRepositories.js";
+import {
+  createInMemoryWorkflowQueueRepository
+} from "../../src/infrastructure/inMemoryWorkflowQueueRepository.js";
 
 const timestamp = "2026-07-26T00:00:00.000Z";
 
@@ -119,6 +125,46 @@ test("recordNodeRunResult updates execution status and redacts node snapshots", 
       return true;
     }
   );
+});
+
+test("queueWorkflowExecution enqueues workflow queue jobs when configured", async () => {
+  const workflowQueueRepository = createInMemoryWorkflowQueueRepository();
+  const { workflow, executionService } = await createWorkflowFixture({
+    workflowQueueRepository
+  });
+  const execution = await executionService.queueWorkflowExecution({
+    actor: { id: "owner_1" },
+    project_id: workflow.project_id,
+    workflow_id: workflow.id,
+    trigger_source: WORKFLOW_TRIGGER_SOURCES.SCHEDULE
+  });
+  const failed = await executionService.recordNodeRunResult({
+    actor: { id: "owner_1" },
+    project_id: workflow.project_id,
+    execution_id: execution.id,
+    node_id: "http",
+    status: WORKFLOW_NODE_RUN_STATUSES.FAILED,
+    error: "HTTP 500"
+  });
+  const partial = await executionService.queuePartialWorkflowExecution({
+    actor: { id: "owner_1" },
+    project_id: workflow.project_id,
+    workflow_id: workflow.id,
+    source_execution_id: failed.id
+  });
+
+  const jobs = await workflowQueueRepository.findAll();
+
+  assert.deepEqual(
+    jobs.map((job) => [job.type, job.payload.execution_id]),
+    [
+      [WORKFLOW_QUEUE_JOB_TYPES.WORKFLOW_EXECUTION, execution.id],
+      [WORKFLOW_QUEUE_JOB_TYPES.WORKFLOW_EXECUTION, partial.id]
+    ]
+  );
+  assert.equal(jobs[0].idempotency_key, `workflow_execution:${execution.id}`);
+  assert.equal(jobs[0].payload.trigger_source, WORKFLOW_TRIGGER_SOURCES.SCHEDULE);
+  assert.equal(jobs[1].payload.partial_of_execution_id, failed.id);
 });
 
 test("recordNodeRunResult rolls up token usage, cost, and trace spans", async () => {
@@ -402,7 +448,9 @@ test("listWorkflowExecutions allows project viewers to inspect execution history
   assert.equal(executions[0].workflow_id, workflow.id);
 });
 
-async function createWorkflowFixture() {
+async function createWorkflowFixture({
+  workflowQueueRepository = null
+} = {}) {
   const repositories = createInMemorySecurityRepositories();
   const idGenerator = sequenceIds();
   const workflowService = createProjectWorkflowSecurityService({
@@ -417,6 +465,7 @@ async function createWorkflowFixture() {
     membershipRepository: repositories.memberships,
     workflowRepository: repositories.workflows,
     executionRepository: repositories.executions,
+    workflowQueueRepository,
     idGenerator,
     clock: () => new Date(timestamp)
   });

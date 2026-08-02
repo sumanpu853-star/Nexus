@@ -32,12 +32,18 @@ import {
   createWorkflowExecutionDashboard,
   createWorkflowExecutionObservabilityReport
 } from "../domain/workflowExecutionObservabilityPolicy.js";
+import {
+  WORKFLOW_QUEUE_JOB_TYPES,
+  createWorkflowExecutionJobPayload,
+  createWorkflowQueueJobRecord
+} from "../domain/workflowQueuePolicy.js";
 
 export function createWorkflowExecutionService({
   projectRepository,
   membershipRepository,
   workflowRepository,
   executionRepository,
+  workflowQueueRepository = null,
   idGenerator,
   clock = () => new Date()
 } = {}) {
@@ -49,6 +55,12 @@ export function createWorkflowExecutionService({
     "findByWorkflowId",
     "save"
   ]);
+  if (workflowQueueRepository) {
+    assertRepository(workflowQueueRepository, "workflowQueueRepository", [
+      "findByIdempotencyKey",
+      "save"
+    ]);
+  }
 
   return Object.freeze({
     async queueWorkflowExecution({
@@ -87,8 +99,16 @@ export function createWorkflowExecutionService({
         metadata,
         timestamp
       });
+      const savedExecution = await executionRepository.save(execution);
 
-      return executionRepository.save(execution);
+      await enqueueWorkflowExecutionJob({
+        workflowQueueRepository,
+        idGenerator,
+        execution: savedExecution,
+        timestamp
+      });
+
+      return savedExecution;
     },
 
     async queuePartialWorkflowExecution({
@@ -160,8 +180,16 @@ export function createWorkflowExecutionService({
         partial_of_execution_id: sourceExecution.id,
         rerun_from_node_id: rerunFromNodeId
       });
+      const savedExecution = await executionRepository.save(execution);
 
-      return executionRepository.save(execution);
+      await enqueueWorkflowExecutionJob({
+        workflowQueueRepository,
+        idGenerator,
+        execution: savedExecution,
+        timestamp
+      });
+
+      return savedExecution;
     },
 
     async recordNodeRunResult({
@@ -494,6 +522,46 @@ export function createWorkflowExecutionService({
       });
     }
   });
+}
+
+async function enqueueWorkflowExecutionJob({
+  workflowQueueRepository,
+  idGenerator,
+  execution,
+  timestamp
+}) {
+  if (!workflowQueueRepository) {
+    return null;
+  }
+
+  const idempotencyKey = `workflow_execution:${execution.id}`;
+  const existingJob = await workflowQueueRepository.findByIdempotencyKey(
+    idempotencyKey
+  );
+
+  if (existingJob) {
+    return existingJob;
+  }
+
+  const job = createWorkflowQueueJobRecord({
+    id: nextId(idGenerator, "queue_job"),
+    type: WORKFLOW_QUEUE_JOB_TYPES.WORKFLOW_EXECUTION,
+    priority: execution.mode === WORKFLOW_EXECUTION_MODES.PRODUCTION ? 50 : 100,
+    idempotency_key: idempotencyKey,
+    payload: createWorkflowExecutionJobPayload({
+      project_id: execution.project_id,
+      workflow_id: execution.workflow_id,
+      execution_id: execution.id,
+      trigger_source: execution.trigger_source,
+      mode: execution.mode,
+      partial_of_execution_id: execution.partial_of_execution_id,
+      rerun_from_node_id: execution.rerun_from_node_id
+    }),
+    available_at: timestamp,
+    created_at: timestamp
+  });
+
+  return workflowQueueRepository.save(job);
 }
 
 function createQueuedExecution({

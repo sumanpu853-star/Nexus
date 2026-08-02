@@ -19,7 +19,7 @@ In simple terms: n8n-style automation plus Botpress-style AI agents, with produc
 | Safe Execution | Replace raw `python_script` execution with a sandboxed code runner or disabled production mode | P0 | Completed |
 | Credentials | Encrypted vault, credential ownership, credential sharing, external secret provider support | P0 | Completed |
 | Builder UX | Schema-driven node forms instead of raw JSON textareas | P0 | Completed |
-| Executions | Execution history, node-level logs, input/output snapshots, rerun from failed node | P1 | In progress |
+| Executions | Execution history, node-level logs, input/output snapshots, rerun from failed node | P1 | Completed |
 | RAG | Knowledge base manager, document ingestion, chunking, embedding, vector search, reranking | P1 | In progress |
 | AI Agents | Agent node with tools, memory, model selection, prompt/instruction editor, tool-call visibility | P1 | In progress |
 | Integrations | HTTP, Slack/Teams, Gmail/Outlook, Google Drive, GitHub, databases, webhooks, schedules | P1 | In progress |
@@ -53,6 +53,7 @@ Fix the current blockers first:
 - Store every execution with status, duration, `started_by`, trigger type, per-node input/output, and error. Foundation implemented with project-scoped execution records, node run snapshots, failure status, redaction, summarized history, node-level logs, diagnostic timelines, token/cost rollups, trace spans, observability reports, and HTTP handlers.
 - Add retry policies, timeout policies, and error branches. Node-level retry/timeout policy validation and error branch planning are implemented before execution runner work.
 - Add manual, production, and webhook execution modes. Mode and trigger validation are implemented at the execution record boundary.
+- Add queue-backed execution workers. Foundation implemented with queue jobs, leases, worker retries, dead-lettering, deterministic node runner adapters, and worker control routes.
 
 ### Phase 4: AI Agent Layer
 
@@ -64,7 +65,7 @@ Fix the current blockers first:
 
 ### Phase 5: Enterprise And Scale
 
-- Add queue-based workers with Redis/Postgres.
+- Add queue-based workers with Redis/Postgres. Foundation implemented with durable repository ports, migration metadata, a dependency-free JSON durable store, queue job records, leases, retry/dead-letter semantics, and worker orchestration; concrete Postgres/Redis adapters still need to replace the deterministic/local adapters.
 - Add RBAC projects/workspaces.
 - Add source control or workflow version export to Git.
 - Add external secrets integration.
@@ -224,6 +225,51 @@ Each production adapter config should include:
 
 Each health check should include adapter type, health status, check time, latency, message, and details. Readiness reports should summarize required adapter coverage, missing required adapters, failing adapters, warning adapters, unchecked adapters, and the current production readiness status.
 
+### Durable Persistence Object
+
+Each repository port should include:
+
+- `name`
+- `resource`
+- `required_methods`
+- `transactional`
+- `durability_required`
+
+Each persistence migration should include:
+
+- `id`
+- `adapter_type`
+- `version`
+- `name`
+- `checksum`
+- `status`
+- `applied_at`
+- `error`
+- `created_at`
+- `updated_at`
+
+### Workflow Queue Job Object
+
+Each workflow queue job should include:
+
+- `id`
+- `type`
+- `status`
+- `priority`
+- `idempotency_key`
+- `payload`
+- `attempts`
+- `max_attempts`
+- `available_at`
+- `leased_by`
+- `leased_at`
+- `lease_expires_at`
+- `completed_at`
+- `failed_at`
+- `last_error`
+- `created_at`
+- `updated_at`
+
 ## Differentiating Features
 
 Nexus should stand out through:
@@ -261,6 +307,8 @@ These implementation foundations are completed so far:
 | P1 integration catalog, project-scoped connections, credential binding, deterministic gateway, webhook endpoints, schedule triggers, and integration node schemas | Completed |
 | P1 deployment environments, safe environment variable snapshots, publish records, active deployment lookup, stable webhook URLs, and deployment HTTP routes | Completed |
 | P1 production adapter catalog, safe adapter configs, deterministic health gateway, readiness reports, and production adapter HTTP routes | Completed |
+| P1 durable repository ports, migration metadata, local durable JSON store, workflow queue jobs, leases, retries, dead-lettering, queue summaries, and queue HTTP routes | Completed |
+| P1 execution worker runtime with queue-backed job claiming, deterministic node runner boundary, run-next/run-until-idle controls, node result/log recording, business failure capture, and worker failure retry/dead-letter behavior | Completed |
 | Schema-driven node catalog and workflow node parameter validation | Completed |
 | Workflow templates and builder form contract | Completed |
 
