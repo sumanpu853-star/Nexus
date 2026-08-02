@@ -255,6 +255,38 @@
         "guidance": "Keep queue job, leasing, retry, and dead-letter rules in the domain layer."
       },
       {
+        "id": "workspace-policy-domain",
+        "title": "Workspace policy domain exists",
+        "target": "src/domain/workspacePolicy.js",
+        "kind": "fileExists",
+        "severity": "required",
+        "guidance": "Keep workspace roles, permissions, memberships, and project-link rules in the domain layer."
+      },
+      {
+        "id": "workflow-source-control-policy-domain",
+        "title": "Workflow source control policy domain exists",
+        "target": "src/domain/workflowSourceControlPolicy.js",
+        "kind": "fileExists",
+        "severity": "required",
+        "guidance": "Keep workflow export files and source-control export records in the domain layer."
+      },
+      {
+        "id": "audit-policy-domain",
+        "title": "Audit policy domain exists",
+        "target": "src/domain/auditPolicy.js",
+        "kind": "fileExists",
+        "severity": "required",
+        "guidance": "Keep audit event validation, filtering, and summaries in the domain layer."
+      },
+      {
+        "id": "admin-dashboard-policy-domain",
+        "title": "Admin dashboard policy domain exists",
+        "target": "src/domain/adminDashboardPolicy.js",
+        "kind": "fileExists",
+        "severity": "required",
+        "guidance": "Keep admin dashboard status and snapshot rules in the domain layer."
+      },
+      {
         "id": "application-layer",
         "title": "Application layer directory exists",
         "target": "src/application",
@@ -383,6 +415,38 @@
         "guidance": "Keep durable persistence migration and readiness orchestration behind a service boundary."
       },
       {
+        "id": "workspace-administration-service",
+        "title": "Workspace administration service exists",
+        "target": "src/application/workspaceAdministrationService.js",
+        "kind": "fileExists",
+        "severity": "required",
+        "guidance": "Keep workspace member and project-link use cases behind an application service boundary."
+      },
+      {
+        "id": "workflow-source-control-service",
+        "title": "Workflow source control service exists",
+        "target": "src/application/workflowSourceControlService.js",
+        "kind": "fileExists",
+        "severity": "required",
+        "guidance": "Keep workflow export orchestration and source-control gateway access behind an application service boundary."
+      },
+      {
+        "id": "audit-log-service",
+        "title": "Audit log service exists",
+        "target": "src/application/auditLogService.js",
+        "kind": "fileExists",
+        "severity": "required",
+        "guidance": "Keep audit recording, filtering, and admin access checks behind an application service boundary."
+      },
+      {
+        "id": "admin-dashboard-service",
+        "title": "Admin dashboard service exists",
+        "target": "src/application/adminDashboardService.js",
+        "kind": "fileExists",
+        "severity": "required",
+        "guidance": "Keep admin dashboard aggregation behind an application service boundary."
+      },
+      {
         "id": "interfaces-layer",
         "title": "Interfaces layer directory exists",
         "target": "src/interfaces",
@@ -499,6 +563,22 @@
         "guidance": "Keep workflow execution worker control routes separate from application orchestration."
       },
       {
+        "id": "workspace-administration-http-handler",
+        "title": "Workspace administration HTTP handler exists",
+        "target": "src/interfaces/workspaceAdministrationHttpHandler.js",
+        "kind": "fileExists",
+        "severity": "required",
+        "guidance": "Keep workspace administration delivery routes separate from application orchestration."
+      },
+      {
+        "id": "admin-dashboard-http-handler",
+        "title": "Admin dashboard HTTP handler exists",
+        "target": "src/interfaces/adminDashboardHttpHandler.js",
+        "kind": "fileExists",
+        "severity": "required",
+        "guidance": "Keep admin dashboard and audit delivery routes separate from application orchestration."
+      },
+      {
         "id": "infrastructure-layer",
         "title": "Infrastructure layer directory exists",
         "target": "src/infrastructure",
@@ -537,6 +617,14 @@
         "kind": "fileExists",
         "severity": "required",
         "guidance": "Resolve external credential references through provider adapters."
+      },
+      {
+        "id": "environment-external-secret-provider",
+        "title": "Environment external secret provider adapter exists",
+        "target": "src/infrastructure/environmentExternalSecretProvider.js",
+        "kind": "fileExists",
+        "severity": "required",
+        "guidance": "Resolve production-style external secret references through an environment provider adapter."
       },
       {
         "id": "security-repositories",
@@ -667,12 +755,60 @@
         "guidance": "Keep queue job persistence and leasing behind a repository adapter."
       },
       {
+        "id": "redis-workflow-queue-repository",
+        "title": "Redis workflow queue repository exists",
+        "target": "src/infrastructure/redisWorkflowQueueRepository.js",
+        "kind": "fileExists",
+        "severity": "required",
+        "guidance": "Keep Redis-backed queue job persistence and leasing behind a repository adapter."
+      },
+      {
         "id": "json-file-durable-store",
         "title": "JSON file durable store exists",
         "target": "src/infrastructure/jsonFileDurableStore.js",
         "kind": "fileExists",
         "severity": "required",
         "guidance": "Keep the dependency-free durable snapshot adapter available for local production-like persistence."
+      },
+      {
+        "id": "postgres-json-repository",
+        "title": "Postgres JSON repository adapter exists",
+        "target": "src/infrastructure/postgresJsonRepository.js",
+        "kind": "fileExists",
+        "severity": "required",
+        "guidance": "Keep Postgres-backed durable runtime records behind repository adapters."
+      },
+      {
+        "id": "workspace-repositories",
+        "title": "Workspace repositories exist",
+        "target": "src/infrastructure/inMemoryWorkspaceRepositories.js",
+        "kind": "fileExists",
+        "severity": "required",
+        "guidance": "Keep workspace, membership, and project-link persistence behind repository adapters."
+      },
+      {
+        "id": "workflow-source-control-repositories",
+        "title": "Workflow source control repositories exist",
+        "target": "src/infrastructure/inMemoryWorkflowSourceControlRepositories.js",
+        "kind": "fileExists",
+        "severity": "required",
+        "guidance": "Keep workflow export persistence behind repository adapters."
+      },
+      {
+        "id": "workflow-source-control-gateway",
+        "title": "Workflow source control gateway exists",
+        "target": "src/infrastructure/inMemoryWorkflowSourceControlGateway.js",
+        "kind": "fileExists",
+        "severity": "required",
+        "guidance": "Keep workflow export delivery to source control behind a gateway boundary."
+      },
+      {
+        "id": "audit-log-repository",
+        "title": "Audit log repository exists",
+        "target": "src/infrastructure/inMemoryAuditLogRepository.js",
+        "kind": "fileExists",
+        "severity": "required",
+        "guidance": "Keep audit event persistence behind a repository adapter."
       },
       {
         "id": "workflow-node-runner",

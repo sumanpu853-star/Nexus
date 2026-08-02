@@ -22,6 +22,7 @@ Nexus is an architecture-first codebase baseline with a small Node.js CLI for re
 - P1 production adapter readiness covers a required adapter catalog, safe adapter configs, deterministic health checks, readiness reports, and production adapter routes.
 - P1 runtime foundation covers durable repository ports, migration metadata, a local JSON durable store, queue jobs, leases, retries, dead-lettering, queue summaries, and queue routes.
 - P1 execution worker runtime covers queue-backed job claiming, deterministic node execution, result/log recording, business failure capture, worker retry/dead-letter handling, and worker control routes.
+- Phase 5 enterprise foundations cover Redis-style queue storage, Postgres-style durable runtime repositories, workspace RBAC, workflow export-to-source-control boundaries, environment external secrets, audit logs, and an admin dashboard.
 - The LanceDB overwrite blocker was audited and is not applicable until vector-store code is introduced.
 - CI runs tests and the architecture review on pushes and pull requests.
 
@@ -60,6 +61,7 @@ Nexus is an architecture-first codebase baseline with a small Node.js CLI for re
 - `docs/decisions/0025-p1-durable-persistence-and-queue-runtime.md` records the durable persistence and queue runtime foundation decision.
 - `docs/decisions/0026-p1-execution-worker-runtime.md` records the queue-backed execution worker decision.
 - `docs/decisions/0027-phase-4-agent-workflow-runtime.md` records the persisted agent workflow-node runtime decision.
+- `docs/decisions/0028-phase-5-enterprise-scale-foundations.md` records the enterprise scale foundation decision.
 - `nexus.config.json` defines the architecture checks used by the CLI and CI.
 - `src/` reserves the future production-code boundaries.
 - `tests/` reserves the future verification boundaries.
@@ -113,4 +115,4 @@ npm run print:config-schema
 
 ## Next Step
 
-Continue with Phase 5 from `docs/FEATURES.md`: replace deterministic/local foundations with production-scale adapters, starting with Postgres/Redis-style persistence and queue providers, then production vector search, model providers, integrations, scheduling, sandboxing, external secrets, audit logs, and admin dashboards.
+Move into P2 collaboration from `docs/FEATURES.md`: workflow versions, compare, restore, comments, templates, and import/export polishing.

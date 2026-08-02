@@ -65,11 +65,11 @@ Fix the current blockers first:
 
 ### Phase 5: Enterprise And Scale
 
-- Add queue-based workers with Redis/Postgres. Foundation implemented with durable repository ports, migration metadata, a dependency-free JSON durable store, queue job records, leases, retry/dead-letter semantics, and worker orchestration; concrete Postgres/Redis adapters still need to replace the deterministic/local adapters.
-- Add RBAC projects/workspaces.
-- Add source control or workflow version export to Git.
-- Add external secrets integration.
-- Add audit logs and an admin dashboard.
+- Add queue-based workers with Redis/Postgres. Foundation implemented with durable repository ports, migration metadata, a dependency-free JSON durable store, queue job records, leases, retry/dead-letter semantics, worker orchestration, a Redis-style queue repository, and Postgres-style runtime repositories.
+- Add RBAC projects/workspaces. Foundation implemented with workspace records, owner/admin/member/viewer roles, membership permissions, workspace-to-project links, service orchestration, and HTTP routes.
+- Add source control or workflow version export to Git. Foundation implemented with canonical workflow export files, manifest generation, source-control export records, and a source-control gateway boundary.
+- Add external secrets integration. Foundation implemented with environment-backed secret resolution and chained provider fallback on the existing credential vault boundary.
+- Add audit logs and an admin dashboard. Foundation implemented with audit event records, filtering, summaries, admin-gated listing, dashboard snapshots, and HTTP routes.
 
 ## Feature Spec Highlights
 
@@ -310,6 +310,11 @@ These implementation foundations are completed so far:
 | P1 production adapter catalog, safe adapter configs, deterministic health gateway, readiness reports, and production adapter HTTP routes | Completed |
 | P1 durable repository ports, migration metadata, local durable JSON store, workflow queue jobs, leases, retries, dead-lettering, queue summaries, and queue HTTP routes | Completed |
 | P1 execution worker runtime with queue-backed job claiming, deterministic node runner boundary, run-next/run-until-idle controls, node result/log recording, business failure capture, and worker failure retry/dead-letter behavior | Completed |
+| Phase 5 Redis-style workflow queue repository and Postgres-style runtime repositories | Completed |
+| Phase 5 workspace RBAC roles, memberships, project links, service orchestration, and HTTP routes | Completed |
+| Phase 5 workflow source-control export records, canonical files, manifest, and gateway boundary | Completed |
+| Phase 5 environment-backed external secret provider and chained provider fallback | Completed |
+| Phase 5 audit event records, admin-gated audit queries, dashboard snapshot aggregation, and HTTP routes | Completed |
 | Schema-driven node catalog and workflow node parameter validation | Completed |
 | Workflow templates and builder form contract | Completed |
 
