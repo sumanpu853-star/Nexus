@@ -595,6 +595,22 @@
         "guidance": "Keep agent tool invocation behind a registry boundary with permission checks in the application layer."
       },
       {
+        "id": "agent-workflow-node-runner",
+        "title": "Agent workflow node runner adapter exists",
+        "target": "src/infrastructure/agentWorkflowNodeRunner.js",
+        "kind": "fileExists",
+        "severity": "required",
+        "guidance": "Keep persisted agent workflow-node execution behind a runner adapter that records usage, cost, traces, and tool-call visibility."
+      },
+      {
+        "id": "agent-workflow-tools",
+        "title": "Agent workflow tools adapter exists",
+        "target": "src/infrastructure/agentWorkflowTools.js",
+        "kind": "fileExists",
+        "severity": "required",
+        "guidance": "Keep knowledge-search and sub-workflow agent tools behind reusable infrastructure adapters."
+      },
+      {
         "id": "integration-repositories",
         "title": "Integration repositories exist",
         "target": "src/infrastructure/inMemoryIntegrationRepositories.js",

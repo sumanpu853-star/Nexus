@@ -264,20 +264,26 @@ async function runLeasedWorkflowExecutionJob({
         });
       }
 
+      const nodeRunStatus = result.status ?? WORKFLOW_NODE_RUN_STATUSES.SUCCESS;
       execution = await workflowExecutionService.recordNodeRunResult({
         actor: { id: execution.started_by },
         project_id: execution.project_id,
         execution_id: execution.id,
         node_id: nodeRun.node_id,
         attempt: nodeRun.attempt,
-        status: WORKFLOW_NODE_RUN_STATUSES.SUCCESS,
+        status: nodeRunStatus,
         output: result.output,
+        error: result.error ?? null,
         usage: result.usage,
         cost: result.cost,
         trace: result.trace,
         secretValues: result.secretValues
       });
       processedNodeIds.push(nodeRun.node_id);
+
+      if (nodeRunStatus !== WORKFLOW_NODE_RUN_STATUSES.SUCCESS) {
+        break;
+      }
     }
 
     const completedJob = await workflowQueueService.completeJob({

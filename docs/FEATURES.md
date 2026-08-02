@@ -21,7 +21,7 @@ In simple terms: n8n-style automation plus Botpress-style AI agents, with produc
 | Builder UX | Schema-driven node forms instead of raw JSON textareas | P0 | Completed |
 | Executions | Execution history, node-level logs, input/output snapshots, rerun from failed node | P1 | Completed |
 | RAG | Knowledge base manager, document ingestion, chunking, embedding, vector search, reranking | P1 | In progress |
-| AI Agents | Agent node with tools, memory, model selection, prompt/instruction editor, tool-call visibility | P1 | In progress |
+| AI Agents | Agent node with tools, memory, model selection, prompt/instruction editor, tool-call visibility | P1 | Completed |
 | Integrations | HTTP, Slack/Teams, Gmail/Outlook, Google Drive, GitHub, databases, webhooks, schedules | P1 | In progress |
 | Deployment | Save/publish states, webhook URLs, environment variables, dev/stage/prod separation | P1 | In progress |
 | Observability | Logs, traces, metrics, cost tracking, token usage, latency, failure-rate dashboards | P1 | Completed |
@@ -57,10 +57,10 @@ Fix the current blockers first:
 
 ### Phase 4: AI Agent Layer
 
-- Add an agent node that can call tools and workflows.
-- Add tool permission controls.
-- Add memory options: session memory, user memory, and semantic memory.
-- Add prompt/version history and model selection.
+- Add an agent node that can call tools and workflows. Foundation implemented with persisted-agent workflow node binding, a worker-compatible agent node runner, reusable knowledge-search and sub-workflow agent tools, and visible tool-call output in workflow node runs.
+- Add tool permission controls. Foundation implemented with allowlisted tools, disabled-tool blocking, approval-required blocking, visible completed/failed/blocked tool-call records, and worker propagation of failed agent runs into failed workflow nodes.
+- Add memory options: session memory, user memory, and semantic memory. Foundation implemented with normalized memory scopes and persisted memory messages, plus knowledge-search tool support for retrieved context.
+- Add prompt/version history and model selection. Foundation implemented with project-scoped agents, prompt version records, configurable model metadata, and persisted-agent workflow node references.
 - Add cost/token tracking. Foundation implemented at the execution and node-run observability boundary.
 
 ### Phase 5: Enterprise And Scale
@@ -304,6 +304,7 @@ These implementation foundations are completed so far:
 | P1 observability dashboard filters, latency buckets, status breakdowns, failure rankings, slowest-node summaries, and cost/token breakdowns | Completed |
 | P1 RAG knowledge base manager, ingestion/chunking, embedding boundary, vector search, reranking hooks, and knowledge search node schema | Completed |
 | P1 AI agent model selection, prompt versions, memory scopes, tool permissions, deterministic model boundary, and visible tool-call records | Completed |
+| P1 persisted-agent workflow node runner with knowledge-search and sub-workflow tools, tool-call visibility, failed-agent node propagation, and token/cost trace rollups | Completed |
 | P1 integration catalog, project-scoped connections, credential binding, deterministic gateway, webhook endpoints, schedule triggers, and integration node schemas | Completed |
 | P1 deployment environments, safe environment variable snapshots, publish records, active deployment lookup, stable webhook URLs, and deployment HTTP routes | Completed |
 | P1 production adapter catalog, safe adapter configs, deterministic health gateway, readiness reports, and production adapter HTTP routes | Completed |

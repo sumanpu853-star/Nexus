@@ -16,7 +16,7 @@ Nexus is an architecture-first codebase baseline with a small Node.js CLI for re
 - P1 execution diagnostics now include summarized execution lists, node-level logs, diagnostic timelines, token/cost rollups, trace spans, observability reports, detail routes, and failed-node rerun routes.
 - P1 observability completion adds dashboard-ready filters, latency buckets, status breakdowns, failure rankings, slowest-node summaries, and cost/token breakdowns.
 - P1 RAG foundation covers project-scoped knowledge bases, document ingestion, chunking, deterministic embedding boundaries, vector search, reranking hooks, and a knowledge search node definition.
-- P1 AI agent foundation covers project-scoped agents, model selection, prompt versions, memory scopes, tool permissions, deterministic model adapters, and visible tool-call records.
+- P1 AI agent foundation covers project-scoped agents, model selection, prompt versions, memory scopes, tool permissions, deterministic model adapters, visible tool-call records, persisted-agent workflow nodes, reusable knowledge/workflow agent tools, and execution usage/cost rollups.
 - P1 integrations foundation covers integration catalog, project-scoped connections, credential binding, deterministic gateway, webhooks, schedules, and node schemas.
 - P1 deployment foundation covers dev/stage/prod environments, safe environment variables, publish records, active deployment lookup, and stable webhook URLs.
 - P1 production adapter readiness covers a required adapter catalog, safe adapter configs, deterministic health checks, readiness reports, and production adapter routes.
@@ -59,6 +59,7 @@ Nexus is an architecture-first codebase baseline with a small Node.js CLI for re
 - `docs/decisions/0024-p1-production-adapter-readiness.md` records the production adapter catalog, config, health, and readiness decision.
 - `docs/decisions/0025-p1-durable-persistence-and-queue-runtime.md` records the durable persistence and queue runtime foundation decision.
 - `docs/decisions/0026-p1-execution-worker-runtime.md` records the queue-backed execution worker decision.
+- `docs/decisions/0027-phase-4-agent-workflow-runtime.md` records the persisted agent workflow-node runtime decision.
 - `nexus.config.json` defines the architecture checks used by the CLI and CI.
 - `src/` reserves the future production-code boundaries.
 - `tests/` reserves the future verification boundaries.
@@ -112,4 +113,4 @@ npm run print:config-schema
 
 ## Next Step
 
-Continue P1 from `docs/FEATURES.md`: replace deterministic/local runtime foundations with concrete production adapters, starting with Postgres/Redis-style persistence and queue providers, then vector search, model providers, integrations, scheduling, sandboxing, and external secrets.
+Continue with Phase 5 from `docs/FEATURES.md`: replace deterministic/local foundations with production-scale adapters, starting with Postgres/Redis-style persistence and queue providers, then production vector search, model providers, integrations, scheduling, sandboxing, external secrets, audit logs, and admin dashboards.

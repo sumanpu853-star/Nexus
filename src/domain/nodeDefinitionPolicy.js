@@ -476,6 +476,13 @@ const BUILT_IN_NODE_DEFINITIONS = deepFreeze([
     parameter_schema: {
       fields: [
         {
+          name: "agent_id",
+          label: "Agent",
+          type: NODE_PARAMETER_TYPES.STRING,
+          control: NODE_PARAMETER_CONTROLS.TEXT,
+          required: false
+        },
+        {
           name: "model",
           label: "Model",
           type: NODE_PARAMETER_TYPES.STRING,

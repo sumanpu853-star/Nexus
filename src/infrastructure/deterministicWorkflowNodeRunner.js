@@ -1,4 +1,5 @@
 import {
+  WORKFLOW_NODE_RUN_STATUSES,
   WORKFLOW_TRACE_SPAN_KINDS
 } from "../domain/workflowExecutionPolicy.js";
 
@@ -143,9 +144,18 @@ function normalizeRunResult(result, node) {
   const normalized = normalizePlainObject(result, "Workflow node run result");
 
   return Object.freeze({
+    status: normalizeEnum(
+      normalized.status ?? WORKFLOW_NODE_RUN_STATUSES.SUCCESS,
+      WORKFLOW_NODE_RUN_STATUSES,
+      "Workflow node run status"
+    ),
     output: normalizePlainObject(
       normalized.output ?? createDefaultOutput({ node, input: {} }),
       "Workflow node run output"
+    ),
+    error: normalizeNullableError(
+      normalized.error ?? null,
+      "Workflow node run error"
     ),
     logs: normalizeLogs(normalized.logs ?? []),
     usage: normalizePlainObject(normalized.usage ?? {}, "Workflow node run usage"),
@@ -214,6 +224,16 @@ function stableId(prefix, value) {
   return `${prefix}_${(hash >>> 0).toString(16).padStart(8, "0")}`;
 }
 
+function normalizeEnum(value, supported, field) {
+  const values = Object.values(supported);
+
+  if (!values.includes(value)) {
+    throw new TypeError(`${field} is not supported.`);
+  }
+
+  return value;
+}
+
 function normalizeRequiredString(value, field) {
   if (typeof value !== "string" || value.trim() === "") {
     throw new TypeError(`${field} must be a non-empty string.`);
@@ -228,6 +248,18 @@ function normalizeStringArray(value, field) {
   }
 
   return value.map((entry) => normalizeRequiredString(entry, field));
+}
+
+function normalizeNullableError(value, field) {
+  if (value === null) {
+    return null;
+  }
+
+  if (typeof value === "string") {
+    return { message: value };
+  }
+
+  return normalizePlainObject(value, field);
 }
 
 function normalizePlainObject(value, field) {
